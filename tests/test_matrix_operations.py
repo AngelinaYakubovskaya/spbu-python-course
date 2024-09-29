@@ -49,7 +49,10 @@ def test_product_matrix():
 def test_product_matrix_invalid_size():
     m1 = [[1, 2, 3], [4, 5, 6]]
     m2 = [[7, 8], [9, 10]]
-    with pytest.raises(ValueError, match="Число столбцов первой матрицы должно быть равно числу строк второй матрицы"):
+    with pytest.raises(
+        ValueError,
+        match="Число столбцов первой матрицы должно быть равно числу строк второй матрицы",
+    ):
         product_matrix(m1, m2)
 
 
