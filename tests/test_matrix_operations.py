@@ -28,13 +28,15 @@ def test_sum_matrix():
 def test_sum_matrix_invalid_size():
     m1 = [[1, 2, 3], [4, 5, 6]]
     m2 = [[7, 8], [9, 10]]
-    assert sum_matrix(m1, m2) == -1  # Несовместимые размеры матриц
+    with pytest.raises(ValueError, match="Размеры матриц не совпадают"):
+        sum_matrix(m1, m2)
 
 
 def test_sum_matrix_empty_matrix():
     m1 = []
     m2 = [[1, 2], [3, 4]]
-    assert sum_matrix(m1, m2) == -1  # Пустая матрица
+    with pytest.raises(ValueError, match="Матрица пуста или None"):
+        sum_matrix(m1, m2)
 
 
 def test_product_matrix():
@@ -47,13 +49,15 @@ def test_product_matrix():
 def test_product_matrix_invalid_size():
     m1 = [[1, 2, 3], [4, 5, 6]]
     m2 = [[7, 8], [9, 10]]
-    assert product_matrix(m1, m2) == -1  # Несовместимые размеры для умножения
+    with pytest.raises(ValueError, match="Число столбцов первой матрицы должно быть равно числу строк второй матрицы"):
+        product_matrix(m1, m2)
 
 
 def test_product_matrix_empty_matrix():
     m1 = []
     m2 = [[1, 2], [3, 4]]
-    assert product_matrix(m1, m2) == -1  # Пустая матрица
+    with pytest.raises(ValueError, match="Матрица пуста или None"):
+        product_matrix(m1, m2)
 
 
 def test_transponir_matrix():
