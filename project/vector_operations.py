@@ -2,10 +2,8 @@ import math
 from typing import Tuple
 
 
-def scalar_product(len_a: float, len_b: float, angle: float) -> float:
-    """Возвращает скалярное произведение векторов через длины и угол между ними."""
+def scalar_product(len_a, len_b, angle):
     return abs(len_a) * abs(len_b) * math.cos(math.radians(angle))
-
 
 def length_vec(A: Tuple[float, float, float], B: Tuple[float, float, float]) -> float:
     """Вычисляет длину вектора между двумя точками A и B."""
