@@ -56,7 +56,7 @@ def product_matrix(
     return result
 
 
-def transpoir_matrix(matrix: Optional[List[List[int]]]) -> List[List[int]]:
+def transponir_matrix(matrix: Optional[List[List[int]]]) -> List[List[int]]:
     """Транспонирование матрицы."""
     rows = get_row_matrix(matrix)
     cols = get_cols_matrix(matrix)
