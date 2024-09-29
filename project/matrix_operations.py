@@ -58,10 +58,11 @@ def product_matrix(
 
 def transponir_matrix(matrix: Optional[List[List[int]]]) -> List[List[int]]:
     """Транспонирование матрицы."""
-    if matrix is None or len(matrix) == 0:
-        return []  # Возвращаем пустую матрицу, если входная матрица пуста
-    rows = get_row_matrix(matrix)
-    cols = get_cols_matrix(matrix)
+    if matrix is None or len(matrix) == 0 or len(matrix[0]) == 0:
+        return []  # Возвращаем пустую матрицу, если входная матрица пуста или пустой список
+
+    rows = len(matrix)       # Количество строк
+    cols = len(matrix[0])    # Количество столбцов
 
     result = [[0 for _ in range(rows)] for _ in range(cols)]
 
