@@ -1,7 +1,6 @@
 import math
 from typing import Tuple
 
-
 def scalar_product(len_a, len_b, angle):
     return abs(len_a) * abs(len_b) * math.cos(math.radians(angle))
 
