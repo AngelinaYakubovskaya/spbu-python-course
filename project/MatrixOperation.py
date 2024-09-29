@@ -14,7 +14,9 @@ def get_cols_matrix(matrix: Optional[List[List[int]]]) -> int:
     return len(matrix[0]) if rows > 0 else 0
 
 
-def sum_matrix(A: Optional[List[List[int]]], B: Optional[List[List[int]]]) -> List[List[int]]:
+def sum_matrix(
+    A: Optional[List[List[int]]], B: Optional[List[List[int]]]
+) -> List[List[int]]:
     """Сложение двух матриц."""
     row_a = get_row_matrix(A)
     cols_a = get_cols_matrix(A)
@@ -29,7 +31,9 @@ def sum_matrix(A: Optional[List[List[int]]], B: Optional[List[List[int]]]) -> Li
     return result
 
 
-def product_matrix(A: Optional[List[List[int]]], B: Optional[List[List[int]]]) -> List[List[int]]:
+def product_matrix(
+    A: Optional[List[List[int]]], B: Optional[List[List[int]]]
+) -> List[List[int]]:
     """Умножение двух матриц."""
     row_a = get_row_matrix(A)
     cols_a = get_cols_matrix(A)
@@ -38,7 +42,9 @@ def product_matrix(A: Optional[List[List[int]]], B: Optional[List[List[int]]]) -
     cols_b = get_cols_matrix(B)
 
     if cols_a != row_b:
-        raise ValueError("Число столбцов первой матрицы должно быть равно числу строк второй матрицы")
+        raise ValueError(
+            "Число столбцов первой матрицы должно быть равно числу строк второй матрицы"
+        )
 
     result = [[0 for _ in range(cols_b)] for _ in range(row_a)]
 

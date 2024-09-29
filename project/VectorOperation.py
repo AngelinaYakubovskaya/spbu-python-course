@@ -19,6 +19,8 @@ def cos_AB(A: Tuple[float, float, float], B: Tuple[float, float, float]) -> floa
     magnitude_B = math.sqrt(B[0] ** 2 + B[1] ** 2 + B[2] ** 2)
 
     if magnitude_A == 0 or magnitude_B == 0:
-        raise ValueError("Длина одного из векторов равна нулю, невозможно вычислить косинус угла")
+        raise ValueError(
+            "Длина одного из векторов равна нулю, невозможно вычислить косинус угла"
+        )
 
     return dot_product / (magnitude_A * magnitude_B)
