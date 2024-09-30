@@ -15,31 +15,31 @@ def get_cols_matrix(matrix: Optional[List[List[int]]]) -> int:
 
 
 def sum_matrix(
-    A: Optional[List[List[int]]], B: Optional[List[List[int]]]
+    a: Optional[List[List[int]]], b: Optional[List[List[int]]]
 ) -> List[List[int]]:
     """Сложение двух матриц."""
-    row_a = get_row_matrix(A)
-    cols_a = get_cols_matrix(A)
+    row_a = get_row_matrix(a)
+    cols_a = get_cols_matrix(a)
 
-    row_b = get_row_matrix(B)
-    cols_b = get_cols_matrix(B)
+    row_b = get_row_matrix(b)
+    cols_b = get_cols_matrix(b)
 
     if row_a != row_b or cols_a != cols_b:
         raise ValueError("Размеры матриц не совпадают")
 
-    result = [[A[i][j] + B[i][j] for j in range(cols_a)] for i in range(row_a)]
+    result = [[a[i][j] + b[i][j] for j in range(cols_a)] for i in range(row_a)]
     return result
 
 
 def product_matrix(
-    A: Optional[List[List[int]]], B: Optional[List[List[int]]]
+    a: Optional[List[List[int]]], b: Optional[List[List[int]]]
 ) -> List[List[int]]:
     """Умножение двух матриц."""
-    row_a = get_row_matrix(A)
-    cols_a = get_cols_matrix(A)
+    row_a = get_row_matrix(a)
+    cols_a = get_cols_matrix(a)
 
-    row_b = get_row_matrix(B)
-    cols_b = get_cols_matrix(B)
+    row_b = get_row_matrix(b)
+    cols_b = get_cols_matrix(b)
 
     if cols_a != row_b:
         raise ValueError(
@@ -51,7 +51,7 @@ def product_matrix(
     for i in range(row_a):
         for j in range(cols_b):
             for k in range(cols_a):
-                result[i][j] += A[i][k] * B[k][j]
+                result[i][j] += a[i][k] * b[k][j]
 
     return result
 
@@ -59,9 +59,11 @@ def product_matrix(
 def transponir_matrix(matrix: Optional[List[List[int]]]) -> List[List[int]]:
     """Транспонирование матрицы."""
     if matrix is None or len(matrix) == 0 or len(matrix[0]) == 0:
-        return []  # Возвращаем пустую матрицу, если входная матрица пуста или пустой список
-    rows = len(matrix)       # Количество строк
-    cols = len(matrix[0])    # Количество столбцов
+        return (
+            []
+        )  # Возвращаем пустую матрицу, если входная матрица пуста или пустой список
+    rows = len(matrix)  # Количество строк
+    cols = len(matrix[0])  # Количество столбцов
 
     result = [[0 for _ in range(rows)] for _ in range(cols)]
 
