@@ -10,6 +10,8 @@ def get_row_matrix(matrix: Optional[List[List[int]]]) -> int:
 
 def get_cols_matrix(matrix: Optional[List[List[int]]]) -> int:
     """Возвращает количество столбцов в матрице."""
+    if matrix is None or not matrix:
+        raise ValueError("Матрица пуста или None")
     rows = get_row_matrix(matrix)
     return len(matrix[0]) if rows > 0 else 0
 
@@ -18,6 +20,9 @@ def sum_matrix(
     a: Optional[List[List[int]]], b: Optional[List[List[int]]]
 ) -> List[List[int]]:
     """Сложение двух матриц."""
+    if a is None or b is None:
+        raise ValueError("Одна из матриц пуста или None")
+
     row_a = get_row_matrix(a)
     cols_a = get_cols_matrix(a)
 
@@ -35,6 +40,9 @@ def product_matrix(
     a: Optional[List[List[int]]], b: Optional[List[List[int]]]
 ) -> List[List[int]]:
     """Умножение двух матриц."""
+    if a is None or b is None:
+        raise ValueError("Одна из матриц пуста или None")
+
     row_a = get_row_matrix(a)
     cols_a = get_cols_matrix(a)
 
@@ -59,9 +67,8 @@ def product_matrix(
 def transponir_matrix(matrix: Optional[List[List[int]]]) -> List[List[int]]:
     """Транспонирование матрицы."""
     if matrix is None or len(matrix) == 0 or len(matrix[0]) == 0:
-        return (
-            []
-        )  # Возвращаем пустую матрицу, если входная матрица пуста или пустой список
+        return []  # Возвращаем пустую матрицу, если входная матрица пуста или пустой список
+
     rows = len(matrix)  # Количество строк
     cols = len(matrix[0])  # Количество столбцов
 
@@ -72,3 +79,4 @@ def transponir_matrix(matrix: Optional[List[List[int]]]) -> List[List[int]]:
             result[j][i] = matrix[i][j]
 
     return result
+
