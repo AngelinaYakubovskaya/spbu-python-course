@@ -6,20 +6,20 @@ def scalar_product(len_a, len_b, angle):
     return abs(len_a) * abs(len_b) * math.cos(math.radians(angle))
 
 
-def length_vec(A: Tuple[float, float, float], B: Tuple[float, float, float]) -> float:
-    """Вычисляет длину вектора между двумя точками A и B."""
-    return math.sqrt((B[0] - A[0]) ** 2 + (B[1] - A[1]) ** 2 + (B[2] - A[2]) ** 2)
+def length_vec(a: Tuple[float, float, float], b: Tuple[float, float, float]) -> float:
+    """Вычисляет длину вектора между двумя точками a и b."""
+    return math.sqrt((b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2 + (b[2] - a[2]) ** 2)
 
 
-def cos_AB(A: Tuple[float, float, float], B: Tuple[float, float, float]) -> float:
-    """Вычисляет косинус угла между векторами A и B."""
-    dot_product = (A[0] * B[0]) + (A[1] * B[1]) + (A[2] * B[2])
-    magnitude_A = math.sqrt(A[0] ** 2 + A[1] ** 2 + A[2] ** 2)
-    magnitude_B = math.sqrt(B[0] ** 2 + B[1] ** 2 + B[2] ** 2)
+def cos_ab(a: Tuple[float, float, float], b: Tuple[float, float, float]) -> float:
+    """Вычисляет косинус угла между векторами a и b."""
+    dot_product = (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
+    magnitude_a = math.sqrt(a[0] ** 2 + a[1] ** 2 + a[2] ** 2)
+    magnitude_b = math.sqrt(b[0] ** 2 + b[1] ** 2 + b[2] ** 2)
 
-    if magnitude_A == 0 or magnitude_B == 0:
+    if magnitude_a == 0 or magnitude_b == 0:
         raise ValueError(
             "Длина одного из векторов равна нулю, невозможно вычислить косинус угла"
         )
 
-    return dot_product / (magnitude_A * magnitude_B)
+    return dot_product / (magnitude_a * magnitude_b)
