@@ -4,13 +4,10 @@ from project.vector_operations import scalar_product, length_vec, cos_ab
 
 
 def test_scalar_product():
-    len_a = 5
-    len_b = 10
-    angle = 30  # угол в градусах
-    expected = abs(len_a) * abs(len_b) * math.cos(math.radians(angle))  # косинус
-    assert scalar_product(len_a, len_b, angle) == pytest.approx(
-        expected, rel=1e-5
-    )  # относительная точность
+    vector_a = (5, 0, 0)  # Пример вектора
+    vector_b = (10 * math.cos(math.radians(30)), 10 * math.sin(math.radians(30)), 0)
+    expected = abs(vector_a[0]) * abs(vector_b[0]) * math.cos(math.radians(30))
+    assert scalar_product(vector_a, vector_b) == pytest.approx(expected, rel=1e-5)
 
 
 def test_length_vec():
