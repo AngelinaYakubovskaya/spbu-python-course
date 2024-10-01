@@ -2,9 +2,15 @@ import math
 from typing import Tuple, Optional
 
 
-def scalar_product(len_a: float, len_b: float, angle: float) -> float:
+def scalar_product(
+    a: Optional[Tuple[float, float, float]], b: Optional[Tuple[float, float, float]]
+) -> float:
     """Вычисляет скалярное произведение двух векторов."""
-    return abs(len_a) * abs(len_b) * math.cos(math.radians(angle))
+    if a is None or b is None:
+        raise ValueError("Один из векторов пуст или None")
+
+    # Скалярное произведение двух векторов
+    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
 
 
 def length_vec(
@@ -24,7 +30,7 @@ def cos_ab(
     if a is None or b is None:
         raise ValueError("Один из векторов пуст или None")
 
-    dot_product = (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
+    dot_product = scalar_product(a, b)
     magnitude_a = math.sqrt(a[0] ** 2 + a[1] ** 2 + a[2] ** 2)
     magnitude_b = math.sqrt(b[0] ** 2 + b[1] ** 2 + b[2] ** 2)
 
