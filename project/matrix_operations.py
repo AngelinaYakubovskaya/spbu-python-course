@@ -10,36 +10,44 @@ def get_row_matrix(matrix: Optional[List[List[int]]]) -> int:
 
 def get_cols_matrix(matrix: Optional[List[List[int]]]) -> int:
     """Возвращает количество столбцов в матрице."""
+    if matrix is None or not matrix:
+        raise ValueError("Матрица пуста или None")
     rows = get_row_matrix(matrix)
     return len(matrix[0]) if rows > 0 else 0
 
 
 def sum_matrix(
-    A: Optional[List[List[int]]], B: Optional[List[List[int]]]
+    a: Optional[List[List[int]]], b: Optional[List[List[int]]]
 ) -> List[List[int]]:
     """Сложение двух матриц."""
-    row_a = get_row_matrix(A)
-    cols_a = get_cols_matrix(A)
+    if a is None or b is None:
+        raise ValueError("Одна из матриц пуста или None")
 
-    row_b = get_row_matrix(B)
-    cols_b = get_cols_matrix(B)
+    row_a = get_row_matrix(a)
+    cols_a = get_cols_matrix(a)
+
+    row_b = get_row_matrix(b)
+    cols_b = get_cols_matrix(b)
 
     if row_a != row_b or cols_a != cols_b:
         raise ValueError("Размеры матриц не совпадают")
 
-    result = [[A[i][j] + B[i][j] for j in range(cols_a)] for i in range(row_a)]
+    result = [[a[i][j] + b[i][j] for j in range(cols_a)] for i in range(row_a)]
     return result
 
 
 def product_matrix(
-    A: Optional[List[List[int]]], B: Optional[List[List[int]]]
+    a: Optional[List[List[int]]], b: Optional[List[List[int]]]
 ) -> List[List[int]]:
     """Умножение двух матриц."""
-    row_a = get_row_matrix(A)
-    cols_a = get_cols_matrix(A)
+    if a is None or b is None:
+        raise ValueError("Одна из матриц пуста или None")
 
-    row_b = get_row_matrix(B)
-    cols_b = get_cols_matrix(B)
+    row_a = get_row_matrix(a)
+    cols_a = get_cols_matrix(a)
+
+    row_b = get_row_matrix(b)
+    cols_b = get_cols_matrix(b)
 
     if cols_a != row_b:
         raise ValueError(
@@ -51,7 +59,7 @@ def product_matrix(
     for i in range(row_a):
         for j in range(cols_b):
             for k in range(cols_a):
-                result[i][j] += A[i][k] * B[k][j]
+                result[i][j] += a[i][k] * b[k][j]
 
     return result
 

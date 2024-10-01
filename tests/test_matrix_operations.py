@@ -19,48 +19,48 @@ def test_get_cols_matrix():
 
 
 def test_sum_matrix():
-    m1 = [[1, 2], [3, 4]]
-    m2 = [[5, 6], [7, 8]]
+    a = [[1, 2], [3, 4]]
+    b = [[5, 6], [7, 8]]
     expected = [[6, 8], [10, 12]]
-    assert sum_matrix(m1, m2) == expected
+    assert sum_matrix(a, b) == expected
 
 
 def test_sum_matrix_invalid_size():
-    m1 = [[1, 2, 3], [4, 5, 6]]
-    m2 = [[7, 8], [9, 10]]
+    a = [[1, 2, 3], [4, 5, 6]]
+    b = [[7, 8], [9, 10]]
     with pytest.raises(ValueError, match="Размеры матриц не совпадают"):
-        sum_matrix(m1, m2)
+        sum_matrix(a, b)
 
 
 def test_sum_matrix_empty_matrix():
-    m1 = []
-    m2 = [[1, 2], [3, 4]]
+    a = []
+    b = [[1, 2], [3, 4]]
     with pytest.raises(ValueError, match="Матрица пуста или None"):
-        sum_matrix(m1, m2)
+        sum_matrix(a, b)
 
 
 def test_product_matrix():
-    m1 = [[1, 2], [3, 4]]
-    m2 = [[5, 6], [7, 8]]
+    a = [[1, 2], [3, 4]]
+    b = [[5, 6], [7, 8]]
     expected = [[19, 22], [43, 50]]
-    assert product_matrix(m1, m2) == expected
+    assert product_matrix(a, b) == expected
 
 
 def test_product_matrix_invalid_size():
-    m1 = [[1, 2, 3], [4, 5, 6]]
-    m2 = [[7, 8], [9, 10]]
+    a = [[1, 2, 3], [4, 5, 6]]
+    b = [[7, 8], [9, 10]]
     with pytest.raises(
         ValueError,
         match="Число столбцов первой матрицы должно быть равно числу строк второй матрицы",
     ):
-        product_matrix(m1, m2)
+        product_matrix(a, b)
 
 
 def test_product_matrix_empty_matrix():
-    m1 = []
-    m2 = [[1, 2], [3, 4]]
+    a = []
+    b = [[1, 2], [3, 4]]
     with pytest.raises(ValueError, match="Матрица пуста или None"):
-        product_matrix(m1, m2)
+        product_matrix(a, b)
 
 
 def test_transponir_matrix():
