@@ -1,11 +1,6 @@
 name: Test checking
 
-on:
-  push:
-    branches:
-      - main
-      - vectormatrix2
-  pull_request:
+on: [push, pull_request]  # Срабатывает на push и pull_request
 
 jobs:
   test:
@@ -26,7 +21,5 @@ jobs:
           pip install pytest mypy
 
       - name: Run tests
-        env:
-          PYTHONPATH: ${{ github.workspace }}
         run: |
           pytest
