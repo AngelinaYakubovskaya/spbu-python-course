@@ -1,5 +1,5 @@
 import pytest
-from project.rgba import rgba_vector
+from rgba import rgba_vector
 
 
 @pytest.mark.parametrize(
@@ -19,4 +19,4 @@ def test_rgba_vector(index, expected_rgba):
 
 def test_rgba_out_of_range():
     """Test RGBA generator for out of range index."""
-    assert rgba_vector(16581376) == (None,)  # Index out of bounds returns None
+    assert rgba_vector(16581376) is None  # Index out of bounds returns None
