@@ -22,6 +22,7 @@ def rgba_vector(index):
     # Convert the index to RGBA values
     a_index = index % total_alpha  # Get the index for Alpha
     rgb_index = index // total_alpha  # Remaining index for RGB
+
     r_index = (rgb_index // (total_colors**2)) % total_colors
     g_index = (rgb_index // total_colors) % total_colors
     b_index = rgb_index % total_colors
