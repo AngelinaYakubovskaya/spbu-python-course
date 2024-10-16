@@ -1,16 +1,16 @@
 def rgba_vector(index):
     """
-    Returns the RGBA vector at the specified index, where the alpha channel is even.
-
-    The RGBA values are generated from 0 to 255 for red, green, and blue, and
-    from 0 to 100 (even numbers only) for the alpha channel.
+    Generate a 4D RGBA vector where alpha takes only even values.
 
     Args:
         index (int): The index of the RGBA vector to retrieve.
 
     Returns:
-        tuple: The RGBA vector as a tuple (r, g, b, a), or None if the index is out of bounds.
+        tuple: A tuple representing the RGBA vector (R, G, B, A) or None if the index is out of range.
     """
+    from itertools import islice
+
+    # Using a generator expression to create RGBA values
     rgba_gen = (
         (r, g, b, a)
         for r in range(256)
@@ -19,10 +19,8 @@ def rgba_vector(index):
         for a in range(0, 101, 2)
     )
 
+    # Using islice to directly get the element at the given index
     try:
-        # Using islice to directly get the element at the given index
-        from itertools import islice
-
         return next(islice(rgba_gen, index, index + 1))
     except StopIteration:
         return None
