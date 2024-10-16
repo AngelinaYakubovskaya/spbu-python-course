@@ -1,34 +1,25 @@
-def rgba_vector(index):
-    """
-    Generate a 4D RGBA vector where alpha takes only even values.
+import itertools
 
-    Args:
-        index (int): The index of the RGBA vector to retrieve (1-based index).
 
-    Returns:
-        tuple: A tuple representing the RGBA vector (R, G, B, A) or None if the index is out of range.
-    """
-    if not isinstance(index, int):
-        return None  # Could also raise an error
-    if index < 1:
-        return None  # Could also raise an error
-    max_elements = 256 * 256 * 256 * 51  # Total possible RGBA values
-    if index > max_elements:
-        return None  # Could also raise an error
+def rgba_generator():
+    return (
+        (r, g, b, a)
+        for r in range(256)
+        for g in range(256)
+        for b in range(256)
+        for a in range(101)
+        if a % 2 == 0
+    )
 
-    # Calculate the 0-based index
-    zero_based_index = index - 1
 
-    # Calculate the alpha index and value
-    alpha_index = zero_based_index % 51  # Total alpha values
-    alpha_value = alpha_index * 2  # Even values: 0, 2, ..., 100
-
-    # Calculate the RGB index
-    rgb_index = zero_based_index // 51
-
-    # Calculate R, G, B values
-    r_value = (rgb_index // (256 * 256)) % 256
-    g_value = (rgb_index // 256) % 256
-    b_value = rgb_index % 256
-
-    return (r_value, g_value, b_value, alpha_value)
+def get_rgba_element(i):
+    if not isinstance(i, int):
+        return "Error: i must be an integer."
+    if i <= 0:
+        return "Error: i must be greater than 0. The numbering of elements in a set of vectors starts from 1."
+    max_elements = 256 * 256 * 256 * 51
+    if i > max_elements:
+        return "Error: i must be within the number of possible vectors."
+    rgba_gen = rgba_generator()
+    element = next(itertools.islice(rgba_gen, i - 1, i), None)
+    return element if element else "Error: index out of range."

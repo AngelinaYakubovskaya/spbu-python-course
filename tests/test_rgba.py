@@ -1,30 +1,55 @@
 import pytest
-from project.rgba import rgba_vector
+from project.rgba import rgba_generator, get_rgba_element
 
 
 @pytest.mark.parametrize(
-    "index, expected_rgba",
+    "expected_rgba, index",
     [
-        (1, (0, 0, 0, 0)),  # Первый RGBA элемент
-        (2, (0, 0, 0, 2)),  # Второй RGBA элемент
-        (3, (0, 0, 0, 4)),  # Третий RGBA элемент
-        (1000000, (15, 151, 151, 100)),  # Большой индекс, ожидаемое значение
-        (16581375, (255, 255, 255, 100)),  # Последний валидный RGBA элемент
+        ((0, 0, 0, 0), 0),
+        ((0, 0, 0, 2), 1),
+        ((0, 0, 0, 4), 2),
+        ((0, 0, 0, 6), 3),
+        ((0, 0, 1, 0), 51),
     ],
 )
-def test_rgba_vector(index, expected_rgba):
-    """Тест генератора RGBA векторов для различных индексов."""
-    assert rgba_vector(index) == expected_rgba
+def test_rgba_generator(expected_rgba, index):
+    gen = rgba_generator()
+    for _ in range(index):
+        next(gen)
+    assert next(gen) == expected_rgba
 
 
-def test_rgba_out_of_range():
-    """Тест генератора RGBA для индекса вне диапазона."""
-    assert rgba_vector(16581376) is None  # Индекс вне границ возвращает None
+@pytest.mark.parametrize(
+    "i, expected",
+    [
+        (1, (0, 0, 0, 0)),
+        (10, (0, 0, 0, 18)),
+        (51 + 1, (0, 0, 1, 0)),
+        (51 * 256 + 1, (0, 1, 0, 0)),
+        (51 * 256 * 256 + 1, (1, 0, 0, 0)),
+    ],
+)
+def test_get_rgba_element(i, expected):
+    assert get_rgba_element(i) == expected
 
 
-def test_invalid_input():
-    """Тест генератора RGBA для недопустимого ввода."""
-    assert rgba_vector("a") is None  # Неправильный тип (строка)
-    assert rgba_vector(-1) is None  # Отрицательный индекс
-    assert rgba_vector(0) is None  # Индекс не может быть нулем
-    assert rgba_vector(16581376) is None  # Индекс превышает максимальный
+@pytest.mark.parametrize(
+    "i, expected_error",
+    [
+        (
+            -1,
+            "Error: i must be greater than 0. The numbering of elements in a set of vectors starts from 1.",
+        ),
+        (
+            0,
+            "Error: i must be greater than 0. The numbering of elements in a set of vectors starts from 1.",
+        ),
+        (
+            256**3 * 51 + 1,
+            "Error: i must be within the number of possible vectors.",
+        ),
+        ("a", "Error: i must be an integer."),
+    ],
+)
+def test_get_rgba_element_errors(i, expected_error):
+    assert get_rgba_element(i) == expected_error
