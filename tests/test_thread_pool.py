@@ -4,17 +4,13 @@ import pytest
 from project.thread_pool import ThreadPool
 
 
-def test_task() -> str:
+def test_task() -> None:
     """
     Example task for the thread pool.
     Simulates a task by printing the thread name and sleeping for 1 second.
-
-    Returns:
-        str: A string indicating task completion.
     """
     print(f"Task executed by {threading.current_thread().name}")
     time.sleep(1)
-    return "Task finished"
 
 
 def test_thread_pool() -> None:
