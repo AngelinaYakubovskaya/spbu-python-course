@@ -26,8 +26,8 @@ class ThreadPool:
         """
         for _ in range(self.num_threads):
             thread = threading.Thread(target=self.worker)
-            self.threads.append(thread)
             thread.start()
+            self.threads.append(thread)
 
     def worker(self) -> None:
         """
@@ -40,13 +40,13 @@ class ThreadPool:
         If there are no tasks available, the thread will wait briefly
         before checking again.
         """
-        while not self.shutdown_flag:  # Check if the thread should shut down
+        while not self.shutdown_flag:
             try:
-                task = self.tasks.get(timeout=1)  # Wait for a task
+                task = self.tasks.get(timeout=0.1)  # Short timeout for responsiveness
                 task()  # Execute the task
                 self.tasks.task_done()  # Mark the task as done
             except queue.Empty:
-                continue  # Continue if no task is found
+                continue  # If no task is found, continue checking
 
     def enqueue(self, task: Callable) -> None:
         """
