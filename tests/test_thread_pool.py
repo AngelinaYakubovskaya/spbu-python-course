@@ -6,7 +6,8 @@ from project.thread_pool import ThreadPool
 
 def test_task() -> None:
     """Example task for the thread pool."""
-    time.sleep(0.1)  # Simulate work to avoid blocking the test runner
+    print(f"Task executed by {threading.current_thread().name}")
+    time.sleep(1)  # Simulate work
 
 
 def test_thread_pool() -> None:
