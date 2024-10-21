@@ -1,5 +1,6 @@
 import threading
 import queue
+from typing import Callable, List
 
 
 class ThreadPool:
@@ -10,14 +11,14 @@ class ThreadPool:
         Parameters:
         num_threads (int): The number of threads in the pool.
         """
-        self.num_threads = num_threads
-        self.tasks = queue.Queue()  # Task queue for storing tasks
-        self.threads = []  # List to store worker threads
-        self.shutdown_flag = False  # Flag to signal when to shut down the pool
+        self.num_threads: int = num_threads  # Тип для num_threads
+        self.tasks: queue.Queue[Callable] = queue.Queue()  # Тип для очереди задач
+        self.threads: List[threading.Thread] = []  # Тип для списка потоков
+        self.shutdown_flag: bool = False  # Тип для флага завершения
 
         self._initialize_threads()  # Initialize and start the worker threads
 
-    def _initialize_threads(self):
+    def _initialize_threads(self) -> None:
         """
         Initializes and starts the specified number of threads.
         Each thread will run the worker function in a separate execution context.
@@ -27,7 +28,7 @@ class ThreadPool:
             self.threads.append(thread)
             thread.start()
 
-    def worker(self):
+    def worker(self) -> None:
         """
         Worker method executed by each thread in the pool.
         Continuously looks for tasks in the task queue and executes them. If the pool
@@ -43,18 +44,18 @@ class ThreadPool:
                 if self.shutdown_flag:
                     break  # Exit the loop if the shutdown flag is set
 
-    def enqueue(self, task: callable):
+    def enqueue(self, task: Callable) -> None:
         """
         Adds a task to the task queue. Tasks are processed by available worker threads.
         If the pool is already shut down, no more tasks are accepted.
 
         Parameters:
-        task (callable): A function representing the task to be executed by a thread.
+        task (Callable): A function representing the task to be executed by a thread.
         """
         if not self.shutdown_flag:
             self.tasks.put(task)
 
-    def dispose(self):
+    def dispose(self) -> None:
         """
         Gracefully shuts down the thread pool. No new tasks will be accepted,
         but already enqueued tasks will be processed before shutting down the pool.
