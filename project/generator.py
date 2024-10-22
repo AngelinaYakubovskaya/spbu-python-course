@@ -30,10 +30,6 @@ def prime_generator():
         num += 1
 
 
-# Создаем экземпляр генератора
-gen = prime_generator()
-
-
 def nth_prime_decorator(func):
     """
     A decorator that returns the k-th prime number.
@@ -55,9 +51,11 @@ def nth_prime_decorator(func):
         Returns:
             int: The k-th prime number.
         """
-        prime = None
-        for _ in range(k):
-            prime = next(gen)  # Используем общий экземпляр генератора
+        # Create a new instance of the prime generator for each call
+        gen = prime_generator()
+        # Advance the generator to the k-th prime
+        for idx in range(k):
+            prime = next(gen)
         return prime
 
     return wrapper
