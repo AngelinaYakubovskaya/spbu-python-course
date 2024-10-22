@@ -1,8 +1,9 @@
-# Создаем один раз экземпляр генератора на уровне модуля
-prime_gen_instance = prime_generator()
+from typing import Generator, Callable
+
+prime_gen_instance = None  # Инициализируем переменную
 
 
-def prime_generator() -> "Generator[int, None, None]":
+def prime_generator() -> Generator[int, None, None]:
     """
     A generator that yields prime numbers in ascending order.
 
@@ -34,15 +35,19 @@ def prime_generator() -> "Generator[int, None, None]":
         num += 1
 
 
-def nth_prime_decorator(func: "Callable[[int], None]") -> "Callable[[int], int]":
+# Теперь мы можем инициализировать экземпляр после определения функции
+prime_gen_instance = prime_generator()
+
+
+def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
     """
-    A decorator that returns the k-th prime number using a single generator instance.
+    A decorator that returns the k-th prime number.
 
     Args:
-        func (Callable[[int], None]): The function being decorated, which will be wrapped.
+        func (function): The function being decorated, which will be wrapped.
 
     Returns:
-        Callable[[int], int]: The wrapped function that returns the k-th prime number.
+        function: The wrapped function that returns the k-th prime number.
     """
 
     def wrapper(k: int) -> int:
@@ -55,8 +60,11 @@ def nth_prime_decorator(func: "Callable[[int], None]") -> "Callable[[int], int]"
         Returns:
             int: The k-th prime number.
         """
-        # Используем уже созданный экземпляр генератора
-        for _ in range(k):
+        # Используем глобальный экземпляр prime_gen_instance
+        global prime_gen_instance
+
+        # Генератор уже запущен, продолжаем получать значения
+        for idx in range(k):
             prime = next(prime_gen_instance)
         return prime
 
@@ -64,7 +72,7 @@ def nth_prime_decorator(func: "Callable[[int], None]") -> "Callable[[int], int]"
 
 
 @nth_prime_decorator
-def get_nth_prime(k: int) -> None:
+def get_nth_prime(k: int) -> int:
     """
     A placeholder function that gets wrapped by the nth_prime_decorator.
 
@@ -72,6 +80,6 @@ def get_nth_prime(k: int) -> None:
         k (int): The index of the prime number to return.
 
     Returns:
-        None: Since the actual return value is determined by the decorator.
+        int: The k-th prime number (determined by the decorator).
     """
     pass
