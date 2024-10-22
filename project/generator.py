@@ -72,6 +72,9 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
         # Обнуляем генератор перед каждым запросом, чтобы избежать неправильных последовательностей
         reset_prime_generator()
 
+        # Проверяем, что генератор инициализирован
+        assert prime_gen_instance is not None, "Prime generator is not initialized."
+
         # Генератор уже запущен, продолжаем получать значения
         for idx in range(k):
             prime = next(prime_gen_instance)
