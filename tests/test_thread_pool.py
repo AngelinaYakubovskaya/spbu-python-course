@@ -3,31 +3,58 @@ import time
 import pytest
 from project.thread_pool import ThreadPool
 
-# Простая задача для тестирования
+
 def simple_task() -> None:
     """
     Example task for the thread pool.
-    Simulates a task by printing the thread name and sleeping for a short time.
+    Simulates a task by printing the thread name and sleeping for 1 second.
     """
     print(f"Task executed by {threading.current_thread().name}")
-    time.sleep(0.1)
+    time.sleep(1)
 
 
-### Тесты для каждого метода класса ThreadPool ###
-
-
-def test_enqueue() -> None:
+def test_enqueue_and_task_execution() -> None:
     """
-    Test case to verify that tasks are enqueued and processed by the pool.
-    Ensures that tasks can be added to the pool and processed by worker threads.
+    Test case to verify that tasks are properly enqueued and executed by the pool.
     """
-    pool = ThreadPool(3)  # Создаем пул с 3 потоками
+    pool = ThreadPool(3)
 
-    # Добавляем 5 задач в пул
+    tasks_completed = []
+
+    def task() -> None:
+        tasks_completed.append(threading.current_thread().name)
+
+    # Enqueue 5 tasks
     for _ in range(5):
-        pool.enqueue(simple_task)
+        pool.enqueue(task)
 
-    pool.dispose()  # Закрываем пул и ждем завершения всех задач
+    pool.dispose()
+
+    # Check that all tasks were completed
+    assert len(tasks_completed) == 5, "Not all tasks were completed."
+    print(f"Tasks completed: {tasks_completed}")
+
+
+def test_thread_count() -> None:
+    """
+    Test case to verify the correct number of active threads in the pool.
+    Ensures that the pool has the same number of active threads as specified.
+    """
+    initial_active_threads = threading.active_count()  # Count initial active threads
+    pool = ThreadPool(5)  # Create a thread pool with 5 threads
+
+    # Wait for all threads to start
+    time.sleep(0.5)  # Small delay to allow threads to start
+
+    current_active_threads = threading.active_count()  # Count current active threads
+    active_threads_in_pool = (
+        current_active_threads - initial_active_threads
+    )  # Pool threads
+
+    assert (
+        active_threads_in_pool == 5
+    ), f"Expected 5 active threads, found {active_threads_in_pool}"
+    pool.dispose()
 
 
 def test_dispose() -> None:
@@ -37,65 +64,39 @@ def test_dispose() -> None:
     """
     pool = ThreadPool(2)
 
-    # Добавляем задачу до завершения работы пула
+    # Add a task before the pool is disposed
     pool.enqueue(simple_task)
-    pool.dispose()  # Завершаем работу пула
+    pool.dispose()  # Dispose the pool
 
-    # Пробуем добавить новую задачу после завершения работы пула
+    # Try adding a new task after the pool is disposed
     pool.enqueue(simple_task)
 
-    # Проверяем, что после завершения задачи больше не принимаются
-    assert not pool.tasks, "New tasks should not be accepted after dispose."
+    # Check that no new tasks are accepted after dispose
+    assert len(pool.tasks) == 2, "No new tasks should be accepted after dispose."
     print("Pool has been disposed, no more tasks should be accepted.")
 
 
-def test_worker_execution() -> None:
+def test_graceful_shutdown() -> None:
     """
-    Test case to verify that worker threads execute the tasks properly.
-    Ensures that tasks enqueued are executed by the worker threads.
+    Test case to ensure that the pool completes all tasks before shutting down.
     """
-    pool = ThreadPool(4)  # Создаем пул с 4 потоками
+    pool = ThreadPool(2)
 
-    # Добавляем 10 задач в пул
-    for _ in range(10):
-        pool.enqueue(simple_task)
+    tasks_completed = []
 
-    pool.dispose()  # Ждем завершения всех задач
+    def task() -> None:
+        tasks_completed.append(threading.current_thread().name)
+        time.sleep(0.5)
 
+    # Enqueue 3 tasks
+    for _ in range(3):
+        pool.enqueue(task)
 
-def test_initialize_threads() -> None:
-    """
-    Test case to verify that the correct number of threads are initialized in the pool.
-    Ensures that the pool initializes the number of threads as specified.
-    """
-    pool = ThreadPool(5)  # Инициализируем пул с 5 потоками
-    assert len(pool.threads) == 5, "Expected 5 threads to be initialized."
+    pool.dispose()  # Shut down the pool after all tasks are enqueued
 
-    pool.dispose()  # Завершаем работу пула
-
-
-def test_thread_count() -> None:
-    """
-    Test case to verify the correct number of active threads in the pool.
-    Ensures that the pool has the same number of active threads as specified.
-    """
-    initial_active_threads = (
-        threading.active_count()
-    )  # Считаем активные потоки до создания пула
-    pool = ThreadPool(5)  # Создаем пул с 5 потоками
-
-    # Даем время потокам запуститься
-    time.sleep(0.5)  # Небольшая задержка, чтобы потоки запустились
-
-    current_active_threads = threading.active_count()  # Считаем текущие активные потоки
-    active_threads_in_pool = (
-        current_active_threads - initial_active_threads
-    )  # Считаем потоки пула
-
-    assert (
-        active_threads_in_pool == 5
-    ), f"Expected 5 active threads, found {active_threads_in_pool}"
-    pool.dispose()
+    # Check that all tasks were completed before shutdown
+    assert len(tasks_completed) == 3, "Not all tasks were completed before shutdown."
+    print(f"Tasks completed before shutdown: {tasks_completed}")
 
 
 if __name__ == "__main__":

@@ -6,9 +6,6 @@ class ThreadPool:
     def __init__(self, num_threads: int):
         """
         Initializes the thread pool with a given number of threads.
-
-        Parameters:
-        num_threads (int): The number of threads in the pool.
         """
         self.num_threads: int = num_threads
         self.tasks: List[Optional[Callable]] = []  # Список задач
@@ -16,6 +13,7 @@ class ThreadPool:
         self.condition = (
             threading.Condition()
         )  # Условие для синхронизации доступа к задачам
+        self.is_shutdown = False  # Флаг завершения работы пула
 
         self._initialize_threads()  # Инициализация и запуск потоков
 
@@ -50,11 +48,11 @@ class ThreadPool:
     def enqueue(self, task: Callable) -> None:
         """
         Adds a task to the task list. Tasks are processed by available worker threads.
-
-        Parameters:
-        task (Callable): A function representing the task to be executed by a thread.
+        Prevents adding new tasks if the pool is in the shutdown state.
         """
         with self.condition:
+            if self.is_shutdown:
+                return  # Не разрешаем добавлять новые задачи после завершения пула
             self.tasks.append(task)  # Добавляем задачу в список
             self.condition.notify()  # Уведомляем один из потоков о новой задаче
 
@@ -64,6 +62,7 @@ class ThreadPool:
         and special `None` tasks will be enqueued to stop the worker threads.
         """
         with self.condition:
+            self.is_shutdown = True  # Устанавливаем флаг завершения
             # Добавляем по одному `None` на каждый поток, чтобы завершить его
             for _ in range(self.num_threads):
                 self.tasks.append(None)
