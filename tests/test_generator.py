@@ -39,6 +39,4 @@ def test_repeat_prime_request():
 
     # Убедимся, что оба вызова возвращают одно и то же значение
     assert second_prime_first_call == second_prime_second_call
-
-    # Дополнительно проверим, что это значение — 3 (второе простое число)
-    assert second_prime_first_call == 3
+    assert second_prime_first_call == 3  # Второе простое число — это 3

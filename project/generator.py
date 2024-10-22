@@ -1,6 +1,6 @@
 from typing import Generator, Callable
 
-prime_gen_instance = None  # Инициализируем переменную
+prime_gen_instance: Generator[int, None, None] = None  # Инициализируем как None
 
 
 def prime_generator() -> Generator[int, None, None]:
@@ -35,8 +35,15 @@ def prime_generator() -> Generator[int, None, None]:
         num += 1
 
 
-# Теперь мы можем инициализировать экземпляр после определения функции
-prime_gen_instance = prime_generator()
+def reset_prime_generator() -> None:
+    """
+    Resets the global prime generator instance to a new instance.
+    """
+    global prime_gen_instance
+    prime_gen_instance = prime_generator()
+
+
+reset_prime_generator()  # Инициализируем глобальный генератор один раз
 
 
 def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
@@ -60,8 +67,8 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
         Returns:
             int: The k-th prime number.
         """
-        # Используем глобальный экземпляр prime_gen_instance
-        global prime_gen_instance
+        # Обнуляем генератор перед каждым запросом, чтобы избежать неправильных последовательностей
+        reset_prime_generator()
 
         # Генератор уже запущен, продолжаем получать значения
         for idx in range(k):
@@ -82,4 +89,4 @@ def get_nth_prime(k: int) -> int:
     Returns:
         int: The k-th prime number (determined by the decorator).
     """
-    pass
+    return 0  # Функция возвращает результат, завернутый декоратором
