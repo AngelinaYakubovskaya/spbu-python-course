@@ -1,4 +1,8 @@
-def prime_generator():
+# Создаем один раз экземпляр генератора на уровне модуля
+prime_gen_instance = prime_generator()
+
+
+def prime_generator() -> "Generator[int, None, None]":
     """
     A generator that yields prime numbers in ascending order.
 
@@ -6,7 +10,7 @@ def prime_generator():
         int: The next prime number.
     """
 
-    def is_prime(num):
+    def is_prime(num: int) -> bool:
         """
         Checks if a number is prime.
 
@@ -30,18 +34,18 @@ def prime_generator():
         num += 1
 
 
-def nth_prime_decorator(func):
+def nth_prime_decorator(func: "Callable[[int], None]") -> "Callable[[int], int]":
     """
-    A decorator that returns the k-th prime number.
+    A decorator that returns the k-th prime number using a single generator instance.
 
     Args:
-        func (function): The function being decorated, which will be wrapped.
+        func (Callable[[int], None]): The function being decorated, which will be wrapped.
 
     Returns:
-        function: The wrapped function that returns the k-th prime number.
+        Callable[[int], int]: The wrapped function that returns the k-th prime number.
     """
 
-    def wrapper(k):
+    def wrapper(k: int) -> int:
         """
         A wrapper function to find the k-th prime number.
 
@@ -51,18 +55,16 @@ def nth_prime_decorator(func):
         Returns:
             int: The k-th prime number.
         """
-        # Create a new instance of the prime generator for each call
-        gen = prime_generator()
-        # Advance the generator to the k-th prime
-        for idx in range(k):
-            prime = next(gen)
+        # Используем уже созданный экземпляр генератора
+        for _ in range(k):
+            prime = next(prime_gen_instance)
         return prime
 
     return wrapper
 
 
 @nth_prime_decorator
-def get_nth_prime(k):
+def get_nth_prime(k: int) -> None:
     """
     A placeholder function that gets wrapped by the nth_prime_decorator.
 
@@ -70,6 +72,6 @@ def get_nth_prime(k):
         k (int): The index of the prime number to return.
 
     Returns:
-        int: The k-th prime number (determined by the decorator).
+        None: Since the actual return value is determined by the decorator.
     """
     pass

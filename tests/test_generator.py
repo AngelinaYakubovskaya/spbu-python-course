@@ -28,3 +28,17 @@ def test_prime_generator(prime_gen):
     expected_primes = [2, 3, 5, 7, 11]
     generated_primes = [next(prime_gen) for _ in range(5)]
     assert generated_primes == expected_primes
+
+
+def test_repeat_prime_request():
+    """Test requesting the same prime number multiple times."""
+    second_prime_first_call = get_nth_prime(2)  # Запрашиваем второе простое число
+    second_prime_second_call = get_nth_prime(
+        2
+    )  # Снова запрашиваем второе простое число
+
+    # Убедимся, что оба вызова возвращают одно и то же значение
+    assert second_prime_first_call == second_prime_second_call
+
+    # Дополнительно проверим, что это значение — 3 (второе простое число)
+    assert second_prime_first_call == 3
