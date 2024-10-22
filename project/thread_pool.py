@@ -1,6 +1,5 @@
 import threading
-import queue
-from typing import Callable, List
+from typing import Callable, List, Optional
 
 
 class ThreadPool:
@@ -11,12 +10,14 @@ class ThreadPool:
         Parameters:
         num_threads (int): The number of threads in the pool.
         """
-        self.num_threads: int = num_threads  # Тип для num_threads
-        self.tasks: queue.Queue[Callable] = queue.Queue()  # Тип для очереди задач
-        self.threads: List[threading.Thread] = []  # Тип для списка потоков
-        self.shutdown_flag: bool = False  # Тип для флага завершения
+        self.num_threads: int = num_threads
+        self.tasks: List[Optional[Callable]] = []  # Список задач
+        self.threads: List[threading.Thread] = []  # Список потоков
+        self.condition = (
+            threading.Condition()
+        )  # Условие для синхронизации доступа к задачам
 
-        self._initialize_threads()  # Initialize and start the worker threads
+        self._initialize_threads()  # Инициализация и запуск потоков
 
     def _initialize_threads(self) -> None:
         """
@@ -31,37 +32,42 @@ class ThreadPool:
     def worker(self) -> None:
         """
         Worker method executed by each thread in the pool.
-        Continuously looks for tasks in the task queue and executes them. If the pool
-        is in shutdown mode and no tasks are available, the thread stops execution.
+        Continuously looks for tasks in the task list and executes them.
+        If the pool receives a `None` task, the thread stops execution.
         """
         while True:
-            try:
-                # Wait for a task from the queue, timeout after 1 second if no tasks
-                task = self.tasks.get(timeout=1)
-                task()  # Execute the task
-                self.tasks.task_done()  # Mark the task as done
-            except queue.Empty:
-                if self.shutdown_flag:
-                    break  # Exit the loop if the shutdown flag is set
+            with self.condition:
+                while not self.tasks:
+                    self.condition.wait()  # Ждём, пока не появятся задачи
+
+                task = self.tasks.pop(0)  # Извлекаем задачу из очереди
+
+            if task is None:  # Специальная задача, которая завершает поток
+                break
+
+            task()  # Выполняем задачу
 
     def enqueue(self, task: Callable) -> None:
         """
-        Adds a task to the task queue. Tasks are processed by available worker threads.
-        If the pool is already shut down, no more tasks are accepted.
+        Adds a task to the task list. Tasks are processed by available worker threads.
 
         Parameters:
         task (Callable): A function representing the task to be executed by a thread.
         """
-        if not self.shutdown_flag:
-            self.tasks.put(task)
+        with self.condition:
+            self.tasks.append(task)  # Добавляем задачу в список
+            self.condition.notify()  # Уведомляем один из потоков о новой задаче
 
     def dispose(self) -> None:
         """
         Gracefully shuts down the thread pool. No new tasks will be accepted,
-        but already enqueued tasks will be processed before shutting down the pool.
-        This method waits for all threads to finish their tasks.
+        and special `None` tasks will be enqueued to stop the worker threads.
         """
-        self.shutdown_flag = True
-        self.tasks.join()  # Wait for all tasks to complete
+        with self.condition:
+            # Добавляем по одному `None` на каждый поток, чтобы завершить его
+            for _ in range(self.num_threads):
+                self.tasks.append(None)
+            self.condition.notify_all()  # Уведомляем все потоки
+
         for thread in self.threads:
-            thread.join()  # Wait for all threads to terminate
+            thread.join()  # Ожидаем завершения всех потоков
