@@ -1,6 +1,8 @@
-from typing import Generator, Callable
+from typing import Generator, Callable, Optional
 
-prime_gen_instance: Generator[int, None, None] = None  # Инициализируем как None
+prime_gen_instance: Optional[
+    Generator[int, None, None]
+] = None  # Инициализируем как None
 
 
 def prime_generator() -> Generator[int, None, None]:
