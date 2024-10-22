@@ -41,6 +41,9 @@ def nth_prime_decorator(func):
         function: The wrapped function that returns the k-th prime number.
     """
 
+    # Create a single instance of the prime generator
+    gen = prime_generator()
+
     def wrapper(k):
         """
         A wrapper function to find the k-th prime number.
@@ -51,7 +54,7 @@ def nth_prime_decorator(func):
         Returns:
             int: The k-th prime number.
         """
-        gen = prime_generator()
+        # Advance the generator to the k-th prime
         for idx in range(k):
             prime = next(gen)
         return prime

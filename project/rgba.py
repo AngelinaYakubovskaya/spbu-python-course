@@ -12,11 +12,14 @@ def generate_rgba():
     Yields:
         tuple: A tuple representing an RGBA value in the format (red, green, blue, alpha).
     """
-    for red in range(256):
-        for green in range(256):
-            for blue in range(256):
-                for alpha in range(0, 101, 2):  # Alpha channel with step 2
-                    yield (red, green, blue, alpha)
+    return (
+        (red, green, blue, alpha)
+        for red in range(256)
+        for green in range(256)
+        for blue in range(256)
+        for alpha in range(0, 101)
+        if alpha % 2 == 0  # Only include even alpha values
+    )
 
 
 def fetch_rgba_element(index):
