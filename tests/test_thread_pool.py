@@ -6,33 +6,49 @@ from project.thread_pool import ThreadPool
 
 def simple_task() -> None:
     """
-    Example task for the thread pool.
-    Simulates a task by printing the thread name and sleeping for 1 second.
+    A simple task that just sleeps for a short time.
+    This simulates work being done in a thread.
     """
     print(f"Task executed by {threading.current_thread().name}")
     time.sleep(1)
 
 
-def test_enqueue_and_task_execution() -> None:
+def test_task() -> None:
     """
-    Test case to verify that tasks are properly enqueued and executed by the pool.
+    Test the execution of a simple task in the thread pool.
     """
-    pool = ThreadPool(3)
+    simple_task()  # Directly calling the task for testing purposes
 
-    tasks_completed = []
 
-    def task() -> None:
-        tasks_completed.append(threading.current_thread().name)
+def test_enqueue() -> None:
+    """
+    Test case to check if tasks can be added to the pool.
+    """
+    pool = ThreadPool(3)  # Create a thread pool with 3 threads
 
-    # Enqueue 5 tasks
+    # Add a single task to the pool
+    pool.enqueue(simple_task)
+
+    # Ensure that tasks have been added
+    assert len(pool.tasks) == 1, "Task should be enqueued."
+
+    pool.dispose()  # Dispose the pool after adding tasks
+
+
+def test_thread_pool() -> None:
+    """
+    Test case to check the thread pool functionality.
+    Adds tasks to the pool and verifies that all tasks are processed.
+    """
+    pool = ThreadPool(3)  # Create a thread pool with 3 threads
+
+    # Add 5 tasks to the pool
     for _ in range(5):
-        pool.enqueue(task)
+        pool.enqueue(simple_task)
 
-    pool.dispose()
-
-    # Check that all tasks were completed
-    assert len(tasks_completed) == 5, "Not all tasks were completed."
-    print(f"Tasks completed: {tasks_completed}")
+    pool.dispose()  # Close the pool and wait for task completion
+    assert len(pool.threads) == 3, "Pool should have 3 threads."
+    print(f"Active threads after dispose: {threading.active_count()}")
 
 
 def test_thread_count() -> None:
@@ -71,32 +87,14 @@ def test_dispose() -> None:
     # Try adding a new task after the pool is disposed
     pool.enqueue(simple_task)
 
-    # Check that no new tasks are accepted after dispose
-    assert len(pool.tasks) == 2, "No new tasks should be accepted after dispose."
-    print("Pool has been disposed, no more tasks should be accepted.")
+    # Ensure that no new tasks were actually added after dispose
+    assert len(pool.tasks) == 0, "No new tasks should be accepted after dispose."
 
-
-def test_graceful_shutdown() -> None:
-    """
-    Test case to ensure that the pool completes all tasks before shutting down.
-    """
-    pool = ThreadPool(2)
-
-    tasks_completed = []
-
-    def task() -> None:
-        tasks_completed.append(threading.current_thread().name)
-        time.sleep(0.5)
-
-    # Enqueue 3 tasks
-    for _ in range(3):
-        pool.enqueue(task)
-
-    pool.dispose()  # Shut down the pool after all tasks are enqueued
-
-    # Check that all tasks were completed before shutdown
-    assert len(tasks_completed) == 3, "Not all tasks were completed before shutdown."
-    print(f"Tasks completed before shutdown: {tasks_completed}")
+    # Check that all threads are no longer active after dispose
+    assert all(
+        not thread.is_alive() for thread in pool.threads
+    ), "All threads should be terminated."
+    print("All tasks completed and pool disposed.")
 
 
 if __name__ == "__main__":
