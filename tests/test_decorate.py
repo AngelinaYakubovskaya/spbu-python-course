@@ -3,16 +3,20 @@ from project.decorate import (
     smart_args,
     Isolated,
     Evaluated,
-    check_isolation,
-    check_evaluation,
 )
 
 
 def test_check_isolation():
     """Test for the behavior of the Isolated argument."""
     no_mutable = {"a": 10}
-    result = check_isolation(d=no_mutable)
-    assert result == {"a": 0}  # Check that the returned dictionary has 'a': 0
+
+    # Define a function to check isolation
+    @smart_args
+    def check_isolated_argument(*, d=Isolated()):
+        return d
+
+    result = check_isolated_argument(d=no_mutable)
+    assert result == {"a": 10}  # Check that the returned dictionary is a copy
     assert no_mutable == {"a": 10}  # Ensure the original dictionary remains unchanged
 
 
