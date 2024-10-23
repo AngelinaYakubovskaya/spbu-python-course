@@ -2,16 +2,10 @@ import copy
 import inspect
 from functools import lru_cache
 
+
 # Implementation of Isolated and Evaluated
 def Isolated():
-    """
-    Returns a marker for arguments that should be passed as deep copies.
-
-    This function is used as a marker within the smart_args decorator.
-    When the decorator detects this marker, it deep copies the argument
-    to ensure that changes made inside the function do not affect the
-    original argument.
-    """
+    """Returns a marker for arguments that should be passed as deep copies."""
     return IsolatedMarker()
 
 
@@ -20,19 +14,7 @@ class IsolatedMarker:
 
 
 def Evaluated(func):
-    """
-    Returns a marker for arguments that should be evaluated at function call.
-
-    This function is used in combination with the smart_args decorator to
-    delay the evaluation of an argument until the function is called, instead
-    of evaluating it at the time of function definition.
-
-    Args:
-        func (callable): The function to evaluate.
-
-    Returns:
-        EvaluatedMarker: A marker indicating delayed evaluation.
-    """
+    """Returns a marker for arguments that should be evaluated at function call."""
     return EvaluatedMarker(func)
 
 
@@ -43,18 +25,7 @@ class EvaluatedMarker:
 
 # Decorator for handling arguments with Isolated and Evaluated markers
 def smart_args(func):
-    """
-    Decorator that processes function arguments marked with Evaluated or Isolated.
-
-    - Arguments marked with Evaluated are computed at function call time.
-    - Arguments marked with Isolated are deep-copied to prevent mutation.
-
-    Args:
-        func (callable): The function to decorate.
-
-    Returns:
-        callable: The decorated function that processes arguments based on the markers.
-    """
+    """Decorator that processes function arguments marked with Evaluated or Isolated."""
     sig = inspect.signature(func)
 
     def wrapper(*args, **kwargs):
@@ -63,7 +34,6 @@ def smart_args(func):
 
         for name, value in bound_args.arguments.items():
             if isinstance(value, EvaluatedMarker):
-                # Evaluate the function at call time
                 bound_args.arguments[name] = value.func()
             elif isinstance(value, IsolatedMarker):
                 # Deep-copy the argument
@@ -99,3 +69,19 @@ def cache_results(max_size=0):
             return cached_func
 
     return decorator
+
+
+# Curry function
+def curry_explicit(func, num_args):
+    """Curries a function to allow partial application of its arguments."""
+
+    def curried(*args):
+        if len(args) > num_args:
+            raise TypeError(
+                f"Too many arguments: expected {num_args}, got {len(args)}."
+            )
+        if len(args) == num_args:
+            return func(*args)
+        return lambda *more_args: curried(*(args + more_args))
+
+    return curried
