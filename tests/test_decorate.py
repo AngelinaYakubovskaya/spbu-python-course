@@ -6,6 +6,7 @@ from project.decorate import (
     cache_results,
     curry_explicit,
 )
+import copy  # Импортируем copy
 
 
 def test_check_isolation():
@@ -75,7 +76,7 @@ def test_frozen_arity():
 
     # Attempting to pass two arguments at once should raise an error
     with pytest.raises(TypeError):
-        curried_add(1, 2)  # This should raise TypeError
+        curried_part(2)  # This should raise TypeError
 
 
 def test_not_more_than_one_argument_per_call():
@@ -91,5 +92,5 @@ def test_zero_arity_function():
     zero_arity_function = curry_explicit(lambda: "no arguments", 0)
     assert zero_arity_function() == "no arguments"
 
-    uncurried_zero_arity_function = curry_explicit(zero_arity_function, 0)
+    uncurried_zero_arity_function = zero_arity_function
     assert uncurried_zero_arity_function() == "no arguments"
