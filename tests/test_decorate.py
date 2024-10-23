@@ -9,14 +9,54 @@ from project.decorate import (
 
 
 def test_check_isolation():
-    """Тест для проверки работы аргумента Isolated."""
+    """Test for the behavior of the Isolated argument."""
     no_mutable = {"a": 10}
     result = check_isolation(d=no_mutable)
-    assert result == {"a": 0}  # Проверка, что возвращается {'a': 0}
-    assert no_mutable == {"a": 10}  # Проверка, что исходный словарь не изменился
+    assert result == {"a": 0}  # Check that the returned dictionary has 'a': 0
+    assert no_mutable == {"a": 10}  # Ensure the original dictionary remains unchanged
 
 
 def test_check_evaluation():
-    """Тест для проверки работы аргумента Evaluated."""
-    result1 = check_evaluation()  # Теперь result1 будет кортежем (x, y)
-    assert result1[0] != result1[1]  # Проверка, что значения разные
+    """Test for the behavior of the Evaluated argument."""
+
+    # Define a counter to track how many times the function is evaluated
+    evaluation_counter = {"count": 0}
+
+    def get_incremented_number():
+        evaluation_counter["count"] += 1
+        return evaluation_counter["count"]
+
+    # Create a new function that uses the Evaluated marker with the counter
+    @smart_args
+    def check_increment_evaluation(*, x=Evaluated(get_incremented_number)):
+        return x
+
+    # Test that the function increments and evaluates the value every time
+    assert check_increment_evaluation() == 1  # First call, should evaluate to 1
+    assert check_increment_evaluation() == 2  # Second call, should evaluate to 2
+    assert check_increment_evaluation() == 3  # Third call, should evaluate to 3
+
+
+def test_combined_isolated_and_evaluated():
+    """Test that a function can handle both Isolated and Evaluated arguments simultaneously."""
+
+    mutable_data = {"value": 42}
+
+    def get_random_number():
+        return 100  # For simplicity, return a constant (can be random)
+
+    # Define a function using both Isolated and Evaluated arguments
+    @smart_args
+    def check_combined(
+        *, isolated_dict=Isolated(), evaluated_num=Evaluated(get_random_number)
+    ):
+        isolated_dict["new_key"] = evaluated_num
+        return isolated_dict, evaluated_num
+
+    # Pass the mutable_data to check if it's isolated and modified correctly
+    result, number = check_combined(isolated_dict=mutable_data)
+    assert result == {"value": 42, "new_key": 100}  # The modified isolated copy
+    assert mutable_data == {"value": 42}  # Original data is unchanged
+
+    # Ensure that `evaluated_num` is recalculated on each call
+    assert number == 100  # Evaluated to the returned value from get_random_number

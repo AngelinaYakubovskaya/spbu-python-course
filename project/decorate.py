@@ -1,8 +1,8 @@
 import copy
 import inspect
-import random
+from functools import lru_cache
 
-
+# Implementation of Isolated and Evaluated
 def Isolated():
     """
     Returns a marker for arguments that should be passed as deep copies.
@@ -11,126 +11,91 @@ def Isolated():
     When the decorator detects this marker, it deep copies the argument
     to ensure that changes made inside the function do not affect the
     original argument.
-
-    Returns:
-        None: Acts as a placeholder to signal isolation of arguments.
     """
-    return None
+    return IsolatedMarker()
+
+
+class IsolatedMarker:
+    pass
 
 
 def Evaluated(func):
     """
-    Evaluates a function passed as an argument and returns the result.
+    Returns a marker for arguments that should be evaluated at function call.
 
     This function is used in combination with the smart_args decorator to
     delay the evaluation of an argument until the function is called, instead
     of evaluating it at the time of function definition.
 
-    Parameters:
+    Args:
         func (callable): The function to evaluate.
 
     Returns:
-        The result of the function call.
+        EvaluatedMarker: A marker indicating delayed evaluation.
     """
-    return func()
+    return EvaluatedMarker(func)
 
 
-def get_random_number():
-    """
-    Generates a random integer between 0 and 100.
-
-    Returns:
-        int: A random number between 0 and 100.
-    """
-    return random.randint(0, 100)
+class EvaluatedMarker:
+    def __init__(self, func):
+        self.func = func
 
 
+# Decorator for handling arguments with Isolated and Evaluated markers
 def smart_args(func):
     """
-    A decorator that processes function arguments based on the following markers:
+    Decorator that processes function arguments marked with Evaluated or Isolated.
 
-    - Evaluated: Evaluates a function at the time of the function call.
-    - Isolated: Deep-copies an argument to prevent changes to the original object.
+    - Arguments marked with Evaluated are computed at function call time.
+    - Arguments marked with Isolated are deep-copied to prevent mutation.
 
-    The decorator analyzes the function signature and processes default arguments
-    accordingly. It ensures that `Isolated` arguments are copied and `Evaluated`
-    arguments are computed at the time of the function call.
-
-    Parameters:
+    Args:
         func (callable): The function to decorate.
 
     Returns:
-        callable: A wrapped version of the function that processes arguments based
-                  on the markers.
+        callable: The decorated function that processes arguments based on the markers.
     """
     sig = inspect.signature(func)
 
     def wrapper(*args, **kwargs):
-        # Store default values based on the signature of the function
-        default_values = {}
+        bound_args = sig.bind_partial(*args, **kwargs)
+        bound_args.apply_defaults()
 
-        for param_name, param in sig.parameters.items():
-            if param_name in kwargs:
-                # Use the provided argument
-                default_values[param_name] = kwargs[param_name]
-            elif param.default != inspect.Parameter.empty:
-                # Check if default argument is Evaluated or Isolated
-                if param.default is Evaluated:  # Changed this line
-                    default_values[param_name] = Evaluated(param.default.func)
-                elif param.default == Isolated():
-                    default_values[param_name] = None  # Set default to None
-                else:
-                    # Use the default argument as-is
-                    default_values[param_name] = param.default
+        for name, value in bound_args.arguments.items():
+            if isinstance(value, EvaluatedMarker):
+                # Evaluate the function at call time
+                bound_args.arguments[name] = value.func()
+            elif isinstance(value, IsolatedMarker):
+                # Deep-copy the argument
+                bound_args.arguments[name] = copy.deepcopy(bound_args.arguments[name])
 
-        new_kwargs = default_values.copy()
-        new_kwargs.update(kwargs)
-
-        # Apply deepcopy for isolated arguments
-        for key, value in new_kwargs.items():
-            if value is None:  # This is Isolated
-                new_kwargs[key] = copy.deepcopy(value)
-
-        return func(**new_kwargs)
+        return func(*bound_args.args, **bound_args.kwargs)
 
     return wrapper
 
 
-@smart_args
-def check_isolation(*, d=Isolated()):
+# Decorator for caching function results
+def cache_results(max_size=0):
     """
-    Test function to check the behavior of Isolated arguments.
+    Decorator for caching function results.
 
-    Modifies a dictionary by setting the key 'a' to 0, but due to the use
-    of the `Isolated` marker, the original dictionary will not be modified.
+    This decorator caches the results of function calls with unique argument sets.
+    The maximum number of cached results is specified by max_size.
 
-    Parameters:
-        d (dict, optional): A dictionary to modify. If not provided, the
-                            argument is deep-copied from the default value.
+    Args:
+        max_size (int): Maximum number of results to cache. If set to 0, no caching is done.
 
     Returns:
-        dict: The modified dictionary with 'a' set to 0.
+        callable: The decorated function with caching enabled.
     """
-    d = copy.deepcopy(d)  # Create a deep copy before modifying
-    d["a"] = 0
-    return d
 
+    def decorator(func):
+        # If cache size is 0, return the original function
+        if max_size == 0:
+            return func
+        else:
+            # Use lru_cache with the given max_size
+            cached_func = lru_cache(maxsize=max_size)(func)
+            return cached_func
 
-@smart_args
-def check_evaluation(*, x=get_random_number(), y=Evaluated(get_random_number)):
-    """
-    Test function to check the behavior of Evaluated arguments.
-
-    Prints two values. The first value `x` is computed when the function
-    is defined, and the second value `y` is evaluated at the time of
-    function call (unless provided as an argument).
-
-    Parameters:
-        x (int, optional): A random number, evaluated at function definition.
-        y (int, optional): A random number, evaluated at function call using
-                           the Evaluated marker. Can be manually overridden.
-
-    Returns:
-        tuple: A tuple containing the values of x and y.
-    """
-    return x, y  # Возвращаем значения x и y
+    return decorator

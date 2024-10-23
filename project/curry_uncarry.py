@@ -5,10 +5,10 @@ def curry_explicit(function, arity):
     """
     Transforms a function into a curried version with a specified arity.
 
-    Currying is the process of transforming a function that takes multiple arguments
-    into a series of functions that each take a single argument.
+    Currying transforms a function that takes multiple arguments into
+    a series of functions that each take one argument.
 
-    Parameters:
+    Args:
         function (callable): The function to be curried.
         arity (int): The number of arguments the function expects (its arity).
 
@@ -23,22 +23,15 @@ def curry_explicit(function, arity):
     if not isinstance(arity, int) or arity < 0:
         raise ValueError("Arity must be a non-negative integer")
 
-    @wraps(function)
-    def curry(arg):
-        def curried_function(*args):
-            if len(args) > 1:
-                raise TypeError("Each curried function should accept only one argument")
+    if arity == 0:
+        return lambda: function()
 
-            new_args = arg_list + [args[0]]
-            if len(new_args) == arity:
-                return function(*new_args)
-
-            return curry_explicit(
-                lambda *rest: function(*(new_args + list(rest))), arity - len(new_args)
-            )
-
-        arg_list = [arg]
-        return curried_function if arity > 1 else function(*arg_list)
+    def curry(*args):
+        if len(args) > arity:
+            raise TypeError(f"Function expected {arity} arguments, got {len(args)}")
+        if len(args) == arity:
+            return function(*args)
+        return lambda *more_args: curry(*(args + more_args))
 
     return curry
 
@@ -47,11 +40,10 @@ def uncurry_explicit(function, arity):
     """
     Transforms a curried function back into a regular function with a specified arity.
 
-    Uncurrying is the reverse of currying, where a function that takes arguments in a
-    series of function calls is transformed back into a function that takes all arguments
-    at once.
+    Uncurrying is the reverse of currying. It transforms a series of function calls,
+    each taking a single argument, back into a function that takes all arguments at once.
 
-    Parameters:
+    Args:
         function (callable): The curried function to be uncurried.
         arity (int): The number of arguments the original function expects.
 
@@ -65,15 +57,14 @@ def uncurry_explicit(function, arity):
     if not isinstance(arity, int) or arity < 0:
         raise ValueError("Arity must be a non-negative integer")
 
-    @wraps(function)
-    def uncurried(*args):
+    def uncurry(*args):
         if len(args) != arity:
-            raise TypeError(
-                f"{function.__name__}() takes exactly {arity} positional arguments but {len(args)} were given"
-            )
+            raise TypeError(f"Expected {arity} arguments, got {len(args)}")
         result = function
         for arg in args:
             result = result(arg)
         return result
+
+    return uncurry
 
     return uncurried
