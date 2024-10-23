@@ -85,4 +85,4 @@ def test_higher_arity_function():
 
     # Uncurrying
     uncurried_concat = uncurry_explicit(curried_concat, 3)
-    assert uncurried_concat("1", "2", "3") == "123"
+    assert uncurried_concat("D", "E", "F") == "DEF"

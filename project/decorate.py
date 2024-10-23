@@ -2,7 +2,6 @@ import copy
 import inspect
 from functools import lru_cache
 
-
 # Implementation of Isolated and Evaluated
 def Isolated():
     """Returns a marker for arguments that should be passed as deep copies."""
