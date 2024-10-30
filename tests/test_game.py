@@ -7,9 +7,9 @@ from project.game import Game
 def test_game_initialization():
     """Test the initialization of the game."""
     players = [
-        MartingaleBot("Bot1"),
-        PercentageBot("Bot2"),
-        PassiveAggressiveBot("Bot3"),
+        MartingaleBot("Bot1", 100),
+        PercentageBot("Bot2", 100),
+        PassiveAggressiveBot("Bot3", 100),
     ]
     game = Game(players=players, max_steps=10)
     assert len(game.players) == 3
@@ -20,9 +20,9 @@ def test_game_initialization():
 def test_game_state_changes():
     """Test that the game state changes after playing a round."""
     players = [
-        MartingaleBot("Bot1"),
-        PercentageBot("Bot2"),
-        PassiveAggressiveBot("Bot3"),
+        MartingaleBot("Bot1", 100),
+        PercentageBot("Bot2", 100),
+        PassiveAggressiveBot("Bot3", 100),
     ]
     game = Game(players=players, max_steps=5)
     initial_balances = [player.balance for player in players]

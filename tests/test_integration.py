@@ -7,9 +7,9 @@ from project.game import Game
 def test_full_game_run():
     """Test the full game run and check if the game ends correctly."""
     players = [
-        MartingaleBot("Bot1"),
-        PercentageBot("Bot2"),
-        PassiveAggressiveBot("Bot3"),
+        MartingaleBot("Bot1", 100),
+        PercentageBot("Bot2", 100),
+        PassiveAggressiveBot("Bot3", 100),
     ]
     game = Game(players=players, max_steps=5)
     initial_balances = [player.balance for player in players]
