@@ -1,0 +1,76 @@
+
+import pytest
+from project.cartesian_tree import CartesianTree
+
+@pytest.fixture
+def tree():
+    """Create a new Cartesian tree before each test."""
+    return CartesianTree()
+
+def test_set_and_get(tree):
+    """Test setting and getting elements in the tree."""
+    tree[5] = "five"
+    tree[2] = "two"
+    tree[8] = "eight"
+    assert tree[5] == "five"
+    assert tree[2] == "two"
+    assert tree[8] == "eight"
+
+def test_update_value(tree):
+    """Test updating the value for an existing key."""
+    tree[5] = "five"
+    tree[5] = "five_updated"
+    assert tree[5] == "five_updated"
+
+def test_contains(tree):
+    """Test checking for the presence of a key in the tree."""
+    tree[5] = "five"
+    assert 5 in tree
+    assert 2 not in tree
+
+def test_delete(tree):
+    """Test deleting a key-value pair from the tree."""
+    tree[5] = "five"
+    tree[2] = "two"
+    del tree[5]
+    assert 5 not in tree
+    with pytest.raises(KeyError):
+        _ = tree[5]  # Ensure KeyError is raised
+
+def test_inorder_iteration(tree):
+    """Test the in-order iterator (sorted traversal)."""
+    tree[5] = "five"
+    tree[2] = "two"
+    tree[8] = "eight"
+    tree[1] = "one"
+    tree[3] = "three"
+    expected_order = [1, 2, 3, 5, 8]
+    assert list(tree) == expected_order
+
+def test_reverse_inorder_iteration(tree):
+    """Test the reverse in-order iterator (reverse sorted traversal)."""
+    tree[5] = "five"
+    tree[2] = "two"
+    tree[8] = "eight"
+    tree[1] = "one"
+    tree[3] = "three"
+    expected_reverse_order = [8, 5, 3, 2, 1]
+    assert list(reversed(tree)) == expected_reverse_order
+
+def test_length(tree):
+    """Test the length of the tree."""
+    tree[5] = "five"
+    tree[2] = "two"
+    assert len(tree) == 2
+    del tree[2]
+    assert len(tree) == 1
+
+def test_empty_tree(tree):
+    """Test behavior of the tree when it is empty."""
+    assert len(tree) == 0
+    with pytest.raises(KeyError):
+        _ = tree[1]  # Should raise KeyError for nonexistent key
+
+
+if __name__ == '__main__':
+    pytest.main()
