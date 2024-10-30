@@ -20,6 +20,47 @@ class CartesianTree(MutableMapping):
         self.root = None
         self.size = 0
 
+    def split(self, node, key):
+        """Split the tree rooted at `node` into two trees around `key`.
+
+        Args:
+            node (TreeNode): Root of the subtree to split.
+            key: The key used as a pivot for splitting.
+
+        Returns:
+            tuple: Two roots representing the left and right subtrees.
+        """
+        if node is None:
+            return None, None
+        elif key < node.key:
+            left, node.left = self.split(node.left, key)
+            return left, node
+        else:
+            node.right, right = self.split(node.right, key)
+            return node, right
+
+    def merge(self, left, right):
+        """Merge two trees `left` and `right` into a single tree.
+
+        Args:
+            left (TreeNode): Root of the left subtree.
+            right (TreeNode): Root of the right subtree.
+
+        Returns:
+            TreeNode: Root of the merged tree.
+        """
+        if left is None:
+            return right
+        if right is None:
+            return left
+
+        if left.priority > right.priority:
+            left.right = self.merge(left.right, right)
+            return left
+        else:
+            right.left = self.merge(left, right.left)
+            return right
+
     def __setitem__(self, key, value):
         """Set the value for the given key in the tree.
 
@@ -59,70 +100,6 @@ class CartesianTree(MutableMapping):
 
         return node
 
-    def _rotate_right(self, node):
-        """Perform a right rotation around the given node.
-
-        Args:
-            node (TreeNode): The node to rotate.
-
-        Returns:
-            TreeNode: The new root of the subtree after rotation.
-        """
-        new_root = node.left
-        node.left = new_root.right
-        new_root.right = node
-        return new_root
-
-    def _rotate_left(self, node):
-        """Perform a left rotation around the given node.
-
-        Args:
-            node (TreeNode): The node to rotate.
-
-        Returns:
-            TreeNode: The new root of the subtree after rotation.
-        """
-        new_root = node.right
-        node.right = new_root.left
-        new_root.left = node
-        return new_root
-
-    def __getitem__(self, key):
-        """Get the value associated with the given key.
-
-        Args:
-            key: The key to look up.
-
-        Returns:
-            The value associated with the key.
-
-        Raises:
-            KeyError: If the key is not found.
-        """
-        return self._find(self.root, key)
-
-    def _find(self, node, key):
-        """Find the value associated with the given key in the tree.
-
-        Args:
-            node (TreeNode): The current node to check.
-            key: The key to find.
-
-        Returns:
-            The value associated with the key.
-
-        Raises:
-            KeyError: If the key is not found.
-        """
-        if node is None:
-            raise KeyError(f"Key {key} not found.")
-        if key < node.key:
-            return self._find(node.left, key)
-        elif key > node.key:
-            return self._find(node.right, key)
-        else:
-            return node.value
-
     def __delitem__(self, key):
         """Delete the key-value pair associated with the given key.
 
@@ -159,18 +136,45 @@ class CartesianTree(MutableMapping):
         elif key > node.key:
             node.right = self._delete(node.right, key)
         else:
-            if node.left is None:
-                return node.right
-            if node.right is None:
-                return node.left
-            if node.left.priority > node.right.priority:
-                node = self._rotate_right(node)
-                node.right = self._delete(node.right, key)
-            else:
-                node = self._rotate_left(node)
-                node.left = self._delete(node.left, key)
+            return self.merge(node.left, node.right)  # Merging left and right subtrees after deletion
 
         return node
+
+    def __getitem__(self, key):
+        """Get the value associated with the given key.
+
+        Args:
+            key: The key to look up.
+
+        Returns:
+            The value associated with the key.
+
+        Raises:
+            KeyError: If the key is not found.
+        """
+        return self._find(self.root, key)
+
+    def _find(self, node, key):
+        """Find the value associated with the given key in the tree.
+
+        Args:
+            node (TreeNode): The current node to check.
+            key: The key to find.
+
+        Returns:
+            The value associated with the key.
+
+        Raises:
+            KeyError: If the key is not found.
+        """
+        if node is None:
+            raise KeyError(f"Key {key} not found.")
+        if key < node.key:
+            return self._find(node.left, key)
+        elif key > node.key:
+            return self._find(node.right, key)
+        else:
+            return node.value
 
     def __iter__(self):
         """Return an iterator for the keys in the tree in sorted order."""
