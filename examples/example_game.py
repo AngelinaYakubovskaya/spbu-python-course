@@ -18,6 +18,11 @@ def run_example_game():
     print("Starting the Roulette Game!\n")
     game.run_game()
 
+    # Display the final balances of players
+    print("\nGame Over!")
+    for player in game.players:
+        print(f"{player.name} has a balance of {player.balance}")
+
 
 if __name__ == "__main__":
     run_example_game()
