@@ -1,40 +1,47 @@
-import random
-from project.bots.base_player import Player
+from bots.base_player import BasePlayer
 
 
-class MartingaleBot(Player):
+class MartingaleBot(BasePlayer):
     """
-    A bot implementing the Martingale betting strategy.
+    Implements the Martingale betting strategy, doubling the bet on a loss.
 
     Attributes:
-        last_bet (int): The last bet made by the bot.
-        min_bet (int): The minimum bet amount.
+        base_bet (int): The initial bet amount.
+        current_bet (int): The current bet amount that doubles after each loss.
     """
 
-    def __init__(self, name: str, balance: int = 100) -> None:
+    def __init__(self, name: str, balance: int):
         """
-        Initialize a Martingale bot with a name and an initial balance.
+        Initializes a MartingaleBot with a name and starting balance.
 
         Args:
-            name (str): The name of the bot.
-            balance (int): The initial balance of the bot. Default is 100.
+            name (str): The name of the player.
+            balance (int): The initial balance of the player.
         """
         super().__init__(name, balance)
-        self.min_bet = 10
-        self.last_bet = self.min_bet
+        self.base_bet = 10
+        self.current_bet = self.base_bet
 
-    def make_bet(self) -> tuple[int, bool]:
+    def make_bet(self):
         """
-        Make a bet using the Martingale strategy.
+        Makes a bet according to the Martingale strategy.
 
         Returns:
-            tuple[int, bool]: The amount bet and whether the bet was successful.
+            dict: The bet with 'type', 'value', and 'amount'.
         """
-        bet = min(self.last_bet, self.balance)
-        outcome = random.choice([True, False])
-        print(f"{self.name} places a Martingale bet of {bet}")
-        if outcome:
-            self.last_bet = self.min_bet
+        bet = {"type": "color", "value": "red", "amount": self.current_bet}
+        self.last_bet = bet
+        return bet
+
+    def update_balance(self, amount):
+        """
+        Updates balance and adjusts the next bet amount based on the outcome.
+
+        Args:
+            amount (int): The win or loss amount from the previous bet.
+        """
+        super().update_balance(amount)
+        if amount > 0:
+            self.current_bet = self.base_bet
         else:
-            self.last_bet *= 2
-        return bet, outcome
+            self.current_bet *= 2

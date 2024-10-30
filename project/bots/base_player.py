@@ -1,43 +1,52 @@
-class Player:
+from abc import ABC, abstractmethod
+
+
+class BasePlayer(ABC):
     """
-    Base class for a player in the roulette game.
+    Abstract base class for a player in the roulette game.
 
     Attributes:
         name (str): The name of the player.
-        balance (int): The current balance of the player.
+        balance (int): The player's current balance.
+        last_bet (dict): Stores the last bet made by the player.
     """
 
-    def __init__(self, name: str, balance: int = 100) -> None:
+    def __init__(self, name: str, balance: int):
         """
-        Initialize a player with a name and an initial balance.
+        Initializes a player with a name and balance.
 
         Args:
             name (str): The name of the player.
-            balance (int): The initial balance of the player. Default is 100.
+            balance (int): The initial balance of the player.
         """
         self.name = name
         self.balance = balance
+        self.last_bet = None
 
-    def make_bet(self) -> tuple[int, bool]:
+    @abstractmethod
+    def make_bet(self):
         """
-        Make a bet. This method should be overridden in derived classes.
+        Abstract method to be implemented by subclasses, specifying the player's betting strategy.
 
-        Raises:
-            NotImplementedError: If the method is not implemented in a derived class.
+        Returns:
+            dict: The bet with 'type', 'value', and 'amount'.
         """
-        raise NotImplementedError(
-            "This method should be implemented in a bot strategy!"
-        )
+        pass
 
-    def update_balance(self, amount: int) -> None:
+    def update_balance(self, amount):
         """
-        Update the player's balance by adding the given amount.
+        Updates the player's balance.
 
         Args:
-            amount (int): The amount to add to the player's balance.
+            amount (int): The amount to add or subtract from the balance.
         """
         self.balance += amount
 
-    def __str__(self) -> str:
-        """Return a string representation of the player."""
-        return f"{self.name}: Balance = {self.balance}"
+    def get_balance(self):
+        """
+        Returns the current balance of the player.
+
+        Returns:
+            int: The player's balance.
+        """
+        return self.balance

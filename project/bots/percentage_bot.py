@@ -1,34 +1,25 @@
+from bots.base_player import BasePlayer
 import random
-from project.bots.base_player import Player
 
 
-class PercentageBot(Player):
+class PercentageBot(BasePlayer):
     """
-    A bot implementing a percentage-based betting strategy.
+    Implements a betting strategy based on a percentage of the current balance.
 
-    Attributes:
-        percentage (float): The percentage of the balance to bet.
+    Methods:
+        make_bet(): Bets a portion of the current balance on a random field.
     """
 
-    def __init__(self, name: str, balance: int = 100) -> None:
+    def make_bet(self):
         """
-        Initialize a percentage bot with a name and an initial balance.
-
-        Args:
-            name (str): The name of the bot.
-            balance (int): The initial balance of the bot. Default is 100.
-        """
-        super().__init__(name, balance)
-        self.percentage = 0.1
-
-    def make_bet(self) -> tuple[int, bool]:
-        """
-        Make a bet based on a percentage of the balance.
+        Makes a bet based on a percentage of the current balance.
 
         Returns:
-            tuple[int, bool]: The amount bet and whether the bet was successful.
+            dict: The bet with 'type', 'value', and 'amount'.
         """
-        bet = max(1, int(self.balance * self.percentage))
-        outcome = random.choice([True, False])
-        print(f"{self.name} places a percentage bet of {bet}")
-        return bet, outcome
+        amount = int(self.balance * 0.1)
+        bet_type = random.choice(["color", "range"])
+        bet_value = "red" if bet_type == "color" else (1, 18)
+        bet = {"type": bet_type, "value": bet_value, "amount": amount}
+        self.last_bet = bet
+        return bet

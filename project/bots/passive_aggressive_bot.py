@@ -1,37 +1,24 @@
+from bots.base_player import BasePlayer
 import random
-from project.bots.base_player import Player
 
 
-class PassiveAggressiveBot(Player):
+class PassiveAggressiveBot(BasePlayer):
     """
-    A bot that alternates between aggressive and passive betting.
+    Implements a passive-aggressive betting strategy, randomly choosing between
+    minimal and maximal bets.
 
-    Attributes:
-        aggressive (bool): Indicates if the next bet will be aggressive.
+    Methods:
+        make_bet(): Bets either a small or a large amount randomly.
     """
 
-    def __init__(self, name: str, balance: int = 100) -> None:
+    def make_bet(self):
         """
-        Initialize a passive-aggressive bot with a name and an initial balance.
-
-        Args:
-            name (str): The name of the bot.
-            balance (int): The initial balance of the bot. Default is 100.
-        """
-        super().__init__(name, balance)
-        self.aggressive = False
-
-    def make_bet(self) -> tuple[int, bool]:
-        """
-        Make a bet that alternates between high and low amounts.
+        Makes a bet by randomly choosing a minimal or large amount.
 
         Returns:
-            tuple[int, bool]: The amount bet and whether the bet was successful.
+            dict: The bet with 'type', 'value', and 'amount'.
         """
-        bet = min(20 if self.aggressive else 5, self.balance)
-        outcome = random.choice([True, False])
-        print(
-            f"{self.name} places a {'high' if self.aggressive else 'low'} bet of {bet}"
-        )
-        self.aggressive = not self.aggressive
-        return bet, outcome
+        amount = 5 if random.choice([True, False]) else 50
+        bet = {"type": "number", "value": random.randint(1, 36), "amount": amount}
+        self.last_bet = bet
+        return bet
