@@ -1,0 +1,43 @@
+@startuml
+
+class Game {
+    - players: List[BasePlayer]
+    - max_steps: int
+    - current_step: int
+    --
+    + play_round()
+    + run_game()
+    + get_game_state(): str
+}
+
+abstract class BasePlayer {
+    - name: str
+    - balance: int
+    --
+    + make_bet(amount: int): int
+    + update_balance(amount: int): None
+}
+
+class MartingaleBot {
+    + make_bet(amount: int): int
+}
+
+class PercentageBot {
+    + make_bet(amount: int): int
+}
+
+class PassiveAggressiveBot {
+    + make_bet(amount: int): int
+}
+
+class Croupier {
+    + determine_winner(bet: int): bool
+}
+
+Game *-- BasePlayer
+BasePlayer <|-- MartingaleBot
+BasePlayer <|-- PercentageBot
+BasePlayer <|-- PassiveAggressiveBot
+Game --> Croupier
+
+@enduml
