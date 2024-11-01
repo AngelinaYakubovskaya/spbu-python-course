@@ -55,14 +55,13 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
             prime_gen_instance = prime_generator()
 
         # If current_index is less than k, continue yielding primes
+        prime = None  # Initialize prime to None
         while current_index < k:
             prime = next(prime_gen_instance)
             current_index += 1
 
         # Return the last prime found (which corresponds to the k-th prime)
-        return (
-            prime if current_index == k else 0
-        )  # Return 0 if current_index is not equal to k
+        return prime if current_index == k and prime is not None else 0
 
     return wrapper
 
