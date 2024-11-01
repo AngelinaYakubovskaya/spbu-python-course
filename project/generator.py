@@ -50,9 +50,10 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
     def wrapper(k: int) -> int:
         global current_index, prime_gen_instance
 
-        # Reset the current index if calling for the first time
-        if current_index == 0:
+        # Reset the generator if needed
+        if current_index == 0 or prime_gen_instance is None:
             prime_gen_instance = prime_generator()
+            current_index = 0  # Reset index
 
         prime = None  # Initialize prime to None
 
@@ -61,7 +62,8 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
             prime = next(prime_gen_instance)
             current_index += 1
 
-        return prime
+        # We should return a valid integer
+        return prime if prime is not None else 0  # Return 0 if somehow prime is None
 
     return wrapper
 
