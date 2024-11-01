@@ -50,20 +50,16 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
     def wrapper(k: int) -> int:
         global current_index, prime_gen_instance
 
-        # Reset the generator if needed
-        if current_index == 0 or prime_gen_instance is None:
+        # Initialize the generator if it's not already
+        if prime_gen_instance is None:
             prime_gen_instance = prime_generator()
-            current_index = 0  # Reset index
 
-        prime = None  # Initialize prime to None
-
-        # Skip numbers until the desired index is reached
+        # If current_index is less than k, continue yielding primes
         while current_index < k:
             prime = next(prime_gen_instance)
             current_index += 1
 
-        # We should return a valid integer
-        return prime if prime is not None else 0  # Return 0 if somehow prime is None
+        return prime  # Return the prime found
 
     return wrapper
 
