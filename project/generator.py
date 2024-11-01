@@ -49,13 +49,18 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
 
     def wrapper(k: int) -> int:
         global current_index, prime_gen_instance
-        if prime_gen_instance is None:
+
+        # Reset the current index if calling for the first time
+        if current_index == 0:
             prime_gen_instance = prime_generator()
+
+        prime = None  # Initialize prime to None
 
         # Skip numbers until the desired index is reached
         while current_index < k:
             prime = next(prime_gen_instance)
             current_index += 1
+
         return prime
 
     return wrapper
