@@ -1,8 +1,8 @@
 from typing import Generator, Callable, Optional
 
-# Глобальный экземпляр генератора простых чисел
+# Global instance of the prime number generator
 prime_gen_instance: Optional[Generator[int, None, None]] = None
-current_index: int = 0  # Отслеживает текущий индекс для последовательности
+current_index = 0
 
 
 def prime_generator() -> Generator[int, None, None]:
@@ -34,7 +34,7 @@ def prime_generator() -> Generator[int, None, None]:
         num += 1
 
 
-# Инициализация глобального экземпляра генератора один раз
+# Initialize the global generator instance once
 prime_gen_instance = prime_generator()
 
 
@@ -48,24 +48,14 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
     """
 
     def wrapper(k: int) -> int:
-        """
-        A wrapper function to find the k-th prime number.
-        Args:
-            k (int): The index of the prime number to return.
-        Returns:
-            int: The k-th prime number.
-        """
         global current_index, prime_gen_instance
-
-        # Убедимся, что prime_gen_instance не равен None
         if prime_gen_instance is None:
             prime_gen_instance = prime_generator()
 
-        # Получаем k-е простое число, начиная с текущего индекса
-        prime: int = 0
-        for _ in range(current_index, k):
+        # Skip numbers until the desired index is reached
+        while current_index < k:
             prime = next(prime_gen_instance)
-            current_index += 1  # Обновляем текущий индекс
+            current_index += 1
         return prime
 
     return wrapper
@@ -80,5 +70,4 @@ def get_nth_prime(k: int) -> int:
     Returns:
         int: The k-th prime number (determined by the decorator).
     """
-    # Возвращаемое значение теперь управляется декоратором
-    return k  # Возвращает значение, установленное декоратором
+    return 0  # The value will be overwritten by the decorator
