@@ -80,4 +80,5 @@ def get_nth_prime(k: int) -> int:
     Returns:
         int: The k-th prime number (determined by the decorator).
     """
-    return 0  # Функция возвращает результат, завернутый декоратором.
+    # Возвращаемое значение теперь управляется декоратором
+    return k  # Возвращает значение, установленное декоратором
