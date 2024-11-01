@@ -55,10 +55,14 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
         Returns:
             int: The k-th prime number.
         """
-        global current_index
+        global current_index, prime_gen_instance
 
-        # Если уже получены значения до нужного индекса, пропускаем их
-        prime = None
+        # Убедимся, что prime_gen_instance не равен None
+        if prime_gen_instance is None:
+            prime_gen_instance = prime_generator()
+
+        # Получаем k-е простое число, начиная с текущего индекса
+        prime: int = 0
         for _ in range(current_index, k):
             prime = next(prime_gen_instance)
             current_index += 1  # Обновляем текущий индекс
