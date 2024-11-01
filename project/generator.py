@@ -32,18 +32,18 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
     Декоратор, который возвращает k-е простое число, используя кэш для хранения
     уже найденных простых чисел.
     """
+    prime_gen_instance = prime_generator()  # Локальная инициализация генератора
 
     def wrapper(k: int) -> int:
+        if k <= 0:
+            raise ValueError("Index must be a positive integer.")
+
         # Проверка, если нужное количество простых чисел уже в кэше
         while len(prime_cache) < k:
-            prime_cache.append(next(prime_generator_instance))
+            prime_cache.append(next(prime_gen_instance))
         return prime_cache[k - 1]
 
     return wrapper
-
-
-# Инициализация экземпляра генератора простых чисел
-prime_generator_instance = prime_generator()
 
 
 @nth_prime_decorator
