@@ -1,8 +1,7 @@
-from typing import Generator, Callable, Optional
+from typing import Generator, Callable, Optional, List
 
-# Global instance of the prime number generator
-prime_gen_instance: Optional[Generator[int, None, None]] = None
-current_index = 0
+# Global cache for storing previously generated primes
+prime_cache: List[int] = []
 
 
 def prime_generator() -> Generator[int, None, None]:
@@ -34,13 +33,9 @@ def prime_generator() -> Generator[int, None, None]:
         num += 1
 
 
-# Initialize the global generator instance once
-prime_gen_instance = prime_generator()
-
-
 def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
     """
-    A decorator that returns the k-th prime number.
+    A decorator that returns the k-th prime number using caching to store previously generated primes.
     Args:
         func (function): The function being decorated, which will be wrapped.
     Returns:
@@ -48,20 +43,15 @@ def nth_prime_decorator(func: Callable[[int], int]) -> Callable[[int], int]:
     """
 
     def wrapper(k: int) -> int:
-        global current_index, prime_gen_instance
+        global prime_cache
 
-        # Initialize the generator if it's not already
-        if prime_gen_instance is None:
-            prime_gen_instance = prime_generator()
+        # Generate primes until we reach at least the k-th prime
+        prime_gen = prime_generator()
+        while len(prime_cache) < k:
+            prime_cache.append(next(prime_gen))
 
-        # If current_index is less than k, continue yielding primes
-        prime = None  # Initialize prime to None
-        while current_index < k:
-            prime = next(prime_gen_instance)
-            current_index += 1
-
-        # Return the last prime found (which corresponds to the k-th prime)
-        return prime if current_index == k and prime is not None else 0
+        # Return the k-th prime (1-indexed)
+        return prime_cache[k - 1]
 
     return wrapper
 
