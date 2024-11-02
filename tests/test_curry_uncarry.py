@@ -1,33 +1,78 @@
 import pytest
-from project.curry_uncarry import curry_explicit, uncurry_explicit
+from project.curry_uncurry import explicit_curry, explicit_uncurry
+
+# Tests for explicit_curry
+@pytest.mark.parametrize(
+    "args, expected",
+    [
+        ((1, 2, 3), "<1, 2, 3>"),
+        ((10, 20, 30), "<10, 20, 30>"),
+        ((5, 5, 5), "<5, 5, 5>"),
+    ],
+)
+def test_explicit_curry_valid_cases(args, expected):
+    f = explicit_curry(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
+    assert f(*args) == expected
 
 
-def test_zero_arity_function():
-    """Test for currying a zero-arity function."""
-    zero_arity_function = curry_explicit(lambda: "no args", 0)
-    assert zero_arity_function() == "no args"
+def test_explicit_curry_arity_zero():
+    f = explicit_curry(lambda: "No args", 0)
+    assert f() == "No args"
 
 
-def test_curry_and_uncurry():
-    """Test currying and uncurrying a function with multiple parameters."""
-    f = lambda x, y, z: f"<{x},{y},{z}>"
-    curried = curry_explicit(f, 3)
-    uncurried = uncurry_explicit(curried, 3)
-
-    assert curried(123)(456)(789) == "<123,456,789>"
-    assert uncurried(123, 456, 789) == "<123,456,789>"
+def test_explicit_curry_arity_one():
+    f = explicit_curry(lambda x: x * 2, 1)
+    assert f(5) == 10
 
 
-def test_invalid_arity():
-    """Test for invalid arity."""
-    with pytest.raises(ValueError):
-        curry_explicit(lambda x: x, -1)
-    with pytest.raises(ValueError):
-        uncurry_explicit(lambda x: x, -1)
-
-
-def test_too_many_arguments():
-    """Test for too many arguments provided."""
-    curried = curry_explicit(lambda x, y: x + y, 2)
+@pytest.mark.parametrize("args", [(1, 2, 3), (1, 2, 3, 4)])  # 3 & 4 arguments
+def test_explicit_curry_too_many_arguments(args):
+    f = explicit_curry(lambda x, y: x + y, 2)
     with pytest.raises(TypeError):
-        curried(1)(2)(3)
+        f(*args)
+
+
+@pytest.mark.parametrize("arity", [-1, "a"])
+def test_explicit_curry_invalid_arity(arity):
+    with pytest.raises(ValueError):
+        explicit_curry(lambda x: x, arity)
+
+
+def test_explicit_curry_function_with_arbitrary_args():
+    f = explicit_curry(print, 2)
+    assert f(1)(2) is None  # print() return None
+
+
+# Tests for explicit_uncurry
+@pytest.mark.parametrize(
+    "args, expected",
+    [
+        ((1, 2, 3), "<1, 2, 3>"),
+        ((4, 5, 6), "<4, 5, 6>"),
+    ],
+)
+def test_explicit_uncurry_valid_cases(args, expected):
+    f = explicit_curry(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
+    g = explicit_uncurry(f, 3)
+    assert g(*args) == expected
+
+
+@pytest.mark.parametrize(
+    "args",
+    [
+        (1,),  # 1 argument
+        (1, 2, 3),  # 3 arguments
+    ],
+)
+def test_explicit_uncurry_wrong_argument_count(args):
+    f = explicit_curry(lambda x, y: x + y, 2)
+    g = explicit_uncurry(f, 2)
+    with pytest.raises(TypeError):
+        g(*args)
+
+
+@pytest.mark.parametrize("arity", [-1, "a"])
+def test_explicit_uncurry_invalid_arity(arity):
+    f = explicit_curry(lambda x: x, 1)
+    with pytest.raises(ValueError):
+        explicit_uncurry(f, arity)

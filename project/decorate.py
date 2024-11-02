@@ -1,50 +1,106 @@
-import copy
-import inspect
-import random
+from copy import deepcopy
+from collections import OrderedDict
+from functools import wraps
+from inspect import signature
+from typing import Any, Callable, Tuple
 
 
 class Isolated:
-    """Marker for arguments that should be deep-copied before function execution."""
+    """Indicates that a parameter should be isolated from mutation."""
+
+    pass
 
 
 class Evaluated:
-    """Marker for arguments that should be evaluated at the time of function execution."""
+    """Represents a parameter that evaluates a function only once for its default value.
 
-    def __init__(self, func):
-        self.func = func
+    Parameters
+    ----------
+    function : Callable[..., Any]
+        A callable that returns the value to be used as the default for the parameter.
 
-    def evaluate(self):
-        """Evaluate the function and return its result."""
-        return self.func()
-
-
-def get_random_number():
-    """Returns a random integer between 0 and 100."""
-    return random.randint(0, 100)
-
-
-def smart_args(func):
+    Raises
+    ------
+    TypeError
+        If the provided function is an instance of Isolated.
     """
-    Decorator to process arguments marked as `Evaluated` or `Isolated`.
-    Arguments marked as `Isolated` will be deep-copied, and those marked as
-    `Evaluated` will be executed at the time of function call.
+
+    def __init__(self, function: Callable[..., Any]) -> None:
+        if isinstance(function, Isolated):
+            raise TypeError("Evaluated cannot be used with Isolated.")
+        self.function = function
+
+    def compute_value(self) -> Any:
+        """Returns the computed value from the function.
+
+        Returns
+        -------
+        Any
+            The value obtained by calling the stored function.
+        """
+        return self.function()
+
+
+def cache_with_special_args(max_cache_size: int = 0) -> Callable:
+    """Decorator to handle special parameter behaviors like Isolated and Evaluated,
+       and to cache results of the function.
+
+    Parameters
+    ----------
+    max_cache_size : int
+        Maximum number of cached results. Defaults to 0 (no caching).
     """
-    sig = inspect.signature(func)
 
-    def wrapper(*args, **kwargs):
-        bound_args = sig.bind(*args, **kwargs)
-        bound_args.apply_defaults()
+    def decorator(target_function: Callable) -> Callable:
+        cache_storage: OrderedDict[Tuple, Any] = OrderedDict()
+        func_signature = signature(target_function)
 
-        # Iterate through bound arguments to apply Isolated and Evaluated logic
-        for param_name, value in bound_args.arguments.items():
-            param = sig.parameters[param_name]
-            if isinstance(param.default, Evaluated) and param_name not in kwargs:
-                bound_args.arguments[param_name] = param.default.evaluate()
-            elif isinstance(param.default, Isolated) or (
-                value is None and param.default is None
-            ):
-                bound_args.arguments[param_name] = copy.deepcopy(value)
+        @wraps(target_function)
+        def inner_wrapper(**input_kwargs: Any) -> Any:
+            """Wrapper to manage parameter defaults, mutations, and caching.
 
-        return func(*bound_args.args, **bound_args.kwargs)
+            Parameters
+            ----------
+            **input_kwargs : Any
+                Keyword arguments passed to the original function.
 
-    return wrapper
+            Returns
+            -------
+            Any
+                The result of calling the original function with adjusted parameters.
+            """
+            updated_params = {}
+
+            for name, param in func_signature.parameters.items():
+                if name in input_kwargs:
+                    value = input_kwargs[name]
+                    # Handle Isolated parameters
+                    if isinstance(param.default, Isolated):
+                        updated_params[name] = deepcopy(value)
+                    else:
+                        updated_params[name] = value
+
+                # Handle Evaluated parameters
+                elif isinstance(param.default, Evaluated):
+                    updated_params[name] = param.default.compute_value()
+                elif param.default is not param.empty:
+                    updated_params[name] = param.default
+
+            # Create a cache key based on the parameter values
+            cache_key = (frozenset(updated_params.items()),)
+
+            if cache_key in cache_storage:
+                return cache_storage[cache_key]  # Return cached result
+
+            result = target_function(**updated_params)  # Compute the result
+            cache_storage[cache_key] = result  # Store result in cache
+
+            # Maintain cache size
+            if max_cache_size > 0 and len(cache_storage) > max_cache_size:
+                cache_storage.popitem(last=False)  # Remove the oldest entry (FIFO)
+
+            return result  # Return the computed result
+
+        return inner_wrapper
+
+    return decorator
