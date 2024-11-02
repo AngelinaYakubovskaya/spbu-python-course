@@ -25,13 +25,10 @@ def test_delete(tree):
     tree[3] = "three"
     tree[8] = "eight"
 
-    # Удаляем ключ 3
-    tree.root.left = None  # Эмулируем удаление
-    with pytest.raises(KeyError):
-        _ = tree.root.left.key  # Проверка на KeyError
-
-    assert tree.root.key == 5
-    assert tree.root.right.key == 8
+    tree.delete(3)  # Удаляем ключ 3
+    assert 3 not in tree  # Проверяем, что ключ 3 больше не существует
+    assert tree.root.left.key == 5  # Корень по-прежнему 5
+    assert tree.root.right.key == 8  # Правый дочерний узел должен быть 8
 
 
 def test_split(tree):
@@ -43,8 +40,8 @@ def test_split(tree):
     left, right = tree.split(tree.root, 5)
 
     # Проверяем, что ключи в левом поддереве меньше 5
-    left_keys = list(node.key for node in left) if left else []
-    right_keys = list(node.key for node in right) if right else []
+    left_keys = list(tree.inorder_traversal(left)) if left else []
+    right_keys = list(tree.inorder_traversal(right)) if right else []
 
     assert all(
         node < 5 for node in left_keys
