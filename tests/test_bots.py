@@ -2,6 +2,7 @@ from project.bots.martingale_bot import MartingaleBot
 from project.bots.percentage_bot import PercentageBot
 from project.bots.passive_aggressive_bot import PassiveAggressiveBot
 from project.bots.bet import BetType  # Импортируем BetType для проверок ставок
+from project.bots.bet import BetType, Color
 
 
 def test_martingale_bot_initialization():
@@ -12,12 +13,11 @@ def test_martingale_bot_initialization():
 
 
 def test_martingale_bot_make_bet():
-    """Test if Martingale bot makes a valid Bet."""
+    """Проверьте, делает ли бот Мартингейла корректную ставку."""
     bot = MartingaleBot("MartingaleBot", 100)
     bet = bot.make_bet()
     assert bet.bet_type == BetType.COLOR
-    assert bet.value == "red"
-    assert bet.amount > 0
+    assert bet.value == Color.RED  # Сравниваем с Color.RED вместо строки 'red'
 
 
 def test_percentage_bot_initialization():

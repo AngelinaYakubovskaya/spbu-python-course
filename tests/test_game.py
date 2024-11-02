@@ -3,6 +3,7 @@ from project.bots.percentage_bot import PercentageBot
 from project.bots.passive_aggressive_bot import PassiveAggressiveBot
 from project.game import Game
 from project.croupier import Croupier
+from project.bots.bet import BetType
 
 
 def test_game_initialization():
@@ -33,9 +34,9 @@ def test_game_state_changes():
 
 
 def test_croupier_payout():
-    """Test if Croupier gives correct payout ratios based on bet type."""
+    """Проверьте, правильно ли Croupier рассчитывает коэффициенты выплат в зависимости от типа ставки."""
     croupier = Croupier()
-    # Проверка выплаты для разных типов ставок
+    # Проверка выплат для разных типов ставок
     assert croupier.payout_ratio(BetType.NUMBER) == 35
     assert croupier.payout_ratio(BetType.COLOR) == 2
     assert croupier.payout_ratio(BetType.RANGE) == 3
