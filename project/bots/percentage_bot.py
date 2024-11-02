@@ -1,5 +1,5 @@
 from project.bots.base_player import BasePlayer
-from project.bots.bet import Bet, BetType, Color  # Импортируем необходимые типы
+from project.bots.bet import Bet, BetType, Color
 import random
 
 
@@ -13,11 +13,14 @@ class PercentageBot(BasePlayer):
             [BetType.COLOR, BetType.RANGE]
         )  # Используем BetType вместо строки
 
+        # Устанавливаем значение ставки на основе типа ставки
         if bet_type == BetType.COLOR:
             bet_value = random.choice([Color.RED, Color.BLACK])
-        else:
-            bet_value = (1, 18)
+        elif bet_type == BetType.RANGE:
+            bet_value = (1, 18)  # Для диапазона тип может быть tuple[int, int]
+            return Bet(
+                bet_type, bet_value, amount
+            )  # Создаем Bet для диапазона отдельно
 
-        bet = Bet(bet_type, bet_value, amount)
-        self.last_bet = bet
-        return bet
+        # Создаем Bet для ставки по цвету
+        return Bet(bet_type, bet_value, amount)
