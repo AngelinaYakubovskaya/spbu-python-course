@@ -5,8 +5,7 @@ def explicit_curry(
     original_func: Callable[..., Any], expected_arity: int
 ) -> Callable[..., Any]:
     """
-    Curries a function to accept one argument at a time, returning a function that
-    collects subsequent arguments until the total count equals the expected arity.
+    Curries a function to accept one argument at a time.
 
     Parameters
     ----------
@@ -17,7 +16,7 @@ def explicit_curry(
 
     Returns
     -------
-    curried_function : Callable[..., Any]
+    Callable[..., Any]
         A curried version of the original function.
 
     Raises
@@ -26,27 +25,20 @@ def explicit_curry(
         If expected_arity is not a non-negative integer.
     TypeError
         If too many arguments are provided when calling the curried function.
-
-    Examples
-    --------
-    >>> curried_function = explicit_curry(lambda x, y, z: f'<{x}, {y}, {z}>', 3)
-    >>> curried_function(1)(2)(3)
-    '<1, 2, 3>'
     """
     if not isinstance(expected_arity, int) or expected_arity < 0:
         raise ValueError("Expected arity must be a non-negative integer.")
 
     def curried(*provided_args: Any) -> Any:
-        if len(provided_args) > expected_arity:
+        arg_count = len(provided_args)
+        if arg_count > expected_arity:
             raise TypeError(
-                f"Too many arguments: expected at most {expected_arity}, got {len(provided_args)}."
+                f"Too many arguments: expected at most {expected_arity}, got {arg_count}."
             )
 
-        # Call the original function if we have enough arguments
-        if len(provided_args) == expected_arity:
+        if arg_count == expected_arity:
             return original_func(*provided_args)
 
-        # Return a new function for additional arguments
         return lambda *additional_args: curried(*(provided_args + additional_args))
 
     return curried
@@ -67,7 +59,7 @@ def explicit_uncurry(
 
     Returns
     -------
-    uncurried_function : Callable[..., Any]
+    Callable[..., Any]
         The uncurried version of the function.
 
     Raises
@@ -76,13 +68,6 @@ def explicit_uncurry(
         If expected_arity is not a non-negative integer.
     TypeError
         If the number of arguments provided does not match the expected arity.
-
-    Examples
-    --------
-    >>> curried_function = explicit_curry(lambda x, y, z: f'<{x}, {y}, {z}>', 3)
-    >>> uncurried_function = explicit_uncurry(curried_function, 3)
-    >>> uncurried_function(1, 2, 3)
-    '<1, 2, 3>'
     """
     if not isinstance(expected_arity, int) or expected_arity < 0:
         raise ValueError("Expected arity must be a non-negative integer.")
