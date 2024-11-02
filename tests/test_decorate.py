@@ -18,8 +18,10 @@ def check_isolation(*, d=Isolated()):
     Returns:
         dict: The modified dictionary with 'a' set to 0.
     """
-    d["a"] = 0
-    return d
+    # Create a deep copy of d to avoid modifying the original dictionary
+    d_copy = copy.deepcopy(d)
+    d_copy["a"] = 0
+    return d_copy
 
 
 @smart_args
