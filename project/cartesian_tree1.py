@@ -37,15 +37,16 @@ class CartesianTree(MutableMapping):
         return new_root
 
     def split(self, node, key):
-        """Split the tree rooted at `node` into two trees around `key`."""
-        if node is None:
+        if not node:
             return None, None
-        elif key < node.key:
-            left, node.left = self.split(node.left, key)
-            return left, node
-        else:
-            node.right, right = self.split(node.right, key)
+        if node.key < key:
+            left, right = self.split(node.right, key)
+            node.right = left
             return node, right
+        else:
+            left, right = self.split(node.left, key)
+            node.left = right
+            return left, node
 
     def merge(self, left, right):
         """Merge two trees `left` and `right` into a single tree."""
