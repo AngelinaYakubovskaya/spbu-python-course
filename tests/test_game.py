@@ -2,6 +2,7 @@ from project.bots.martingale_bot import MartingaleBot
 from project.bots.percentage_bot import PercentageBot
 from project.bots.passive_aggressive_bot import PassiveAggressiveBot
 from project.game import Game
+from project.croupier import Croupier
 
 
 def test_game_initialization():
@@ -29,3 +30,12 @@ def test_game_state_changes():
     game.play_round()
     new_balances = [player.balance for player in players]
     assert initial_balances != new_balances
+
+
+def test_croupier_payout():
+    """Test if Croupier gives correct payout ratios based on bet type."""
+    croupier = Croupier()
+    # Проверка выплаты для разных типов ставок
+    assert croupier.payout_ratio(BetType.NUMBER) == 35
+    assert croupier.payout_ratio(BetType.COLOR) == 2
+    assert croupier.payout_ratio(BetType.RANGE) == 3

@@ -1,25 +1,20 @@
 from project.bots.base_player import BasePlayer
+from project.bots.bet import Bet, BetType
 import random
 
 
 class PercentageBot(BasePlayer):
     """
     Implements a betting strategy based on a percentage of the current balance.
-
-    Methods:
-        make_bet(): Bets a portion of the current balance on a random field.
     """
 
-    def make_bet(self):
-        """
-        Makes a bet based on a percentage of the current balance.
-
-        Returns:
-            dict: The bet with 'type', 'value', and 'amount'.
-        """
+    def make_bet(self) -> Bet:
         amount = int(self.balance * 0.1)
-        bet_type = random.choice(["color", "range"])
-        bet_value = "red" if bet_type == "color" else (1, 18)
-        bet = {"type": bet_type, "value": bet_value, "amount": amount}
+        bet_type = random.choice([BetType.COLOR, BetType.RANGE])
+        if bet_type == BetType.COLOR:
+            bet_value = Color.RED
+        else:
+            bet_value = (1, 18)  # Example range
+        bet = Bet(bet_type, bet_value, amount)
         self.last_bet = bet
         return bet

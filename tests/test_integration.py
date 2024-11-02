@@ -12,7 +12,6 @@ def test_full_game_run():
         PassiveAggressiveBot("Bot3", 100),
     ]
     game = Game(players=players, max_steps=5)
-    initial_balances = [player.balance for player in players]
     game.run_game()
     winners = [p for p in game.players if p.balance > 0]
     assert len(winners) >= 1 or game.current_step == game.max_steps

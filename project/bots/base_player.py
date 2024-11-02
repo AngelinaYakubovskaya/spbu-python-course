@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from project.bots.bet import Bet
 
 
 class BasePlayer(ABC):
@@ -8,7 +9,7 @@ class BasePlayer(ABC):
     Attributes:
         name (str): The name of the player.
         balance (int): The player's current balance.
-        last_bet (dict): Stores the last bet made by the player.
+        last_bet (Bet): Stores the last bet made by the player.
     """
 
     def __init__(self, name: str, balance: int):
@@ -21,19 +22,19 @@ class BasePlayer(ABC):
         """
         self.name = name
         self.balance = balance
-        self.last_bet = None
+        self.last_bet: Bet = None  # Указываем, что last_bet будет экземпляром Bet
 
     @abstractmethod
-    def make_bet(self):
+    def make_bet(self) -> Bet:
         """
         Abstract method to be implemented by subclasses, specifying the player's betting strategy.
 
         Returns:
-            dict: The bet with 'type', 'value', and 'amount'.
+            Bet: The bet made by the player.
         """
         pass
 
-    def update_balance(self, amount):
+    def update_balance(self, amount: int):
         """
         Updates the player's balance.
 
@@ -42,7 +43,7 @@ class BasePlayer(ABC):
         """
         self.balance += amount
 
-    def get_balance(self):
+    def get_balance(self) -> int:
         """
         Returns the current balance of the player.
 
