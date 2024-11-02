@@ -4,7 +4,7 @@ from project.decorate import smart_args, Isolated, Evaluated
 
 
 @smart_args
-def check_isolation(*, d=Isolated()):
+def check_isolation(*, d=Isolated):
     """
     Test function to check the behavior of Isolated arguments.
 

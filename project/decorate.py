@@ -3,9 +3,8 @@ import inspect
 import random
 
 
-def Isolated():
+class Isolated:
     """Marker for arguments that should be deep-copied before function execution."""
-    return None
 
 
 class Evaluated:
