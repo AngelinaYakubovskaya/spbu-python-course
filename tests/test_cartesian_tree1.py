@@ -27,10 +27,9 @@ def test_delete(tree):
 
     tree.delete(3)  # Удаляем ключ 3
     assert 3 not in tree  # Проверяем, что ключ 3 больше не существует
-    assert tree.root.left is not None  # Убедитесь, что левый узел существует
-    assert (
-        tree.root.left.key == 5
-    )  # Левый дочерний узел должен остаться 5, если у него нет детей
+    # Проверяем, что левый узел не равен None
+    assert tree.root.left is not None
+    assert tree.root.left.key == 5  # Убедитесь, что левый узел корня все еще существует
 
 
 def test_split(tree):

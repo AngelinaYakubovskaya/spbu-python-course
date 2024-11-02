@@ -26,11 +26,11 @@ class CartesianTree:
             return (None, None)
         if key < node.key:
             left, right = self.split(node.left, key)
-            node.left = right
+            node.left = right  # Установим правое поддерево как левое
             return (left, node)
         else:
             left, right = self.split(node.right, key)
-            node.right = left
+            node.right = left  # Установим левое поддерево как правое
             return (node, right)
 
     def delete(self, key):
@@ -45,10 +45,12 @@ class CartesianTree:
         elif key > node.key:
             node.right = self._delete(node.right, key)
         else:
+            # Узел с единственным ребенком или без детей
             if node.left is None:
                 return node.right
             elif node.right is None:
                 return node.left
+            # Узел с двумя детьми
             min_larger_node = self._get_min(node.right)
             node.key = min_larger_node.key
             node.right = self._delete(node.right, min_larger_node.key)
