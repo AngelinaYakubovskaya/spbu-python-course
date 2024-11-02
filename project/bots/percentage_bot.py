@@ -9,18 +9,13 @@ class PercentageBot(BasePlayer):
     def make_bet(self) -> Bet:
         """Makes a bet based on a percentage of the current balance."""
         amount = int(self.balance * 0.1)
-        bet_type = random.choice(
-            [BetType.COLOR, BetType.RANGE]
-        )  # Используем BetType вместо строки
+        bet_type = random.choice([BetType.COLOR, BetType.RANGE])
 
         # Устанавливаем значение ставки на основе типа ставки
         if bet_type == BetType.COLOR:
             bet_value = random.choice([Color.RED, Color.BLACK])
-        elif bet_type == BetType.RANGE:
-            bet_value = (1, 18)  # Для диапазона тип может быть tuple[int, int]
-            return Bet(
-                bet_type, bet_value, amount
-            )  # Создаем Bet для диапазона отдельно
+            return Bet(bet_type, bet_value, amount)  # Возвращаем ставку с типом Color
 
-        # Создаем Bet для ставки по цвету
-        return Bet(bet_type, bet_value, amount)
+        elif bet_type == BetType.RANGE:
+            range_value = (1, 18)  # Значение для диапазона
+            return Bet(bet_type, range_value, amount)  # Возвращаем ставку с типом Range
