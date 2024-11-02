@@ -230,3 +230,21 @@ class CartesianTree(MutableMapping):
         node.right = new_root.left
         new_root.left = node
         return new_root
+
+    def __reversed__(self):
+        """Return an iterator for the keys in the tree in reverse sorted order."""
+        yield from self._reverse_inorder(self.root)
+
+    def _reverse_inorder(self, node):
+        """Perform a reverse in-order traversal of the tree.
+
+        Args:
+            node (TreeNode): The current node to traverse.
+
+        Yields:
+            The keys of the nodes in reverse sorted order.
+        """
+        if node is not None:
+            yield from self._reverse_inorder(node.right)
+            yield node.key
+            yield from self._reverse_inorder(node.left)
