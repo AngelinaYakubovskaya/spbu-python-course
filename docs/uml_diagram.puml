@@ -45,12 +45,10 @@ class MartingaleBot {
 }
 
 class PercentageBot {
-    +__init__(name: str, balance: int)
     +make_bet() -> Bet
 }
 
 class PassiveAggressiveBot {
-    +__init__(name: str, balance: int)
     +make_bet() -> Bet
 }
 
