@@ -1,63 +1,137 @@
-from copy import deepcopy
-from collections import OrderedDict
+from typing import Callable, Any
 from functools import wraps
-from inspect import signature
-from typing import Any, Callable, Tuple
+import inspect
+import copy
+from collections import OrderedDict
+import hashlib
+import json
+
+
+class Evaluated:
+    """Class-flag for evaluating.
+    If it is passed as default value of parameter then after applying smart_args
+    decorator given function is evaluated every time.
+
+    Attributes
+    ----------
+    func : Callable
+        Function with no arguments. Returns some value.
+    """
+
+    def __init__(self, func: Callable):
+        if not callable(func) or inspect.signature(func).parameters:
+            raise ValueError("Evaluated requires a function with no arguments")
+        self.func = func
 
 
 class Isolated:
-    """Indicates that a parameter should be isolated from mutation."""
+    """Fictitious class-flag."""
 
     pass
 
 
-class Evaluated:
-    """Represents a parameter that evaluates a function only once for its default value."""
+def smart_args(func: Callable):
+    """Decorator for analyzing default values of function keyword arguments.
+    Copy and/or calculate default values before executing function.
 
-    def __init__(self, function: Callable[..., Any]) -> None:
-        if isinstance(function, Isolated):
-            raise TypeError("Evaluated cannot be used with Isolated.")
-        self.function = function
+    Evaluated(func_without_args) - calculate default value before
+    execution of function. func_without_args takes no argument and
+    returns some value.
 
-    def compute_value(self) -> Any:
-        """Returns the computed value from the function."""
-        return self.function()
+    Isolated - fictitious value; argument must be passed but it is
+    copied (deep copy).
 
+    Parameters
+    ----------
+    func : Callable
+        Function which arguments will be copied/calculated.
 
-def cache_with_special_args(max_cache_size: int = 0) -> Callable:
-    """Decorator to handle special parameter behaviors and cache results of the function."""
+    Raises
+    ------
+    AssertionError
+        If Evaluated or Isolated is passed as arguments.
+    ValueError
+        If Isolated is passed as argument to Evaluated.
+        If default value is Isolated but argument wasn't passed.
 
-    def decorator(target_function: Callable) -> Callable:
-        cache_storage: OrderedDict[Tuple, Any] = OrderedDict()
-        func_signature = signature(target_function)
+    Returns
+    -------
+    Function
+    """
+    signature = inspect.signature(func)
+    params = signature.parameters
 
-        @wraps(target_function)
-        def inner_wrapper(**input_kwargs: Any) -> Any:
-            updated_params = {}
-            for name, param in func_signature.parameters.items():
-                if name in input_kwargs:
-                    value = input_kwargs[name]
-                    if isinstance(param.default, Isolated):
-                        updated_params[name] = deepcopy(value)
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        # check if Evaluated or Isolated is passed as argument
+        assert all(not isinstance(arg, (Evaluated, Isolated)) for arg in args)
+        assert all(not isinstance(kwargs[key], (Evaluated, Isolated)) for key in kwargs)
+
+        new_kwargs = {}
+        for name, param in params.items():
+            if name in kwargs and not isinstance(param.default, (Isolated, Evaluated)):
+                new_kwargs[name] = kwargs[name]
+
+            else:
+                if isinstance(param.default, Evaluated):
+                    d_value = param.default.func
+                    if d_value == Isolated:
+                        raise ValueError(
+                            "Isolated was passed as argument to Evaluated."
+                        )
+
+                    if name in kwargs:
+                        new_kwargs[name] = kwargs[name]
                     else:
-                        updated_params[name] = value
-                elif isinstance(param.default, Evaluated):
-                    updated_params[name] = param.default.compute_value()
-                elif param.default is not param.empty:
-                    updated_params[name] = param.default
+                        new_kwargs[name] = d_value()
+                if isinstance(param.default, Isolated):
+                    if name in kwargs:
+                        new_kwargs[name] = copy.deepcopy(kwargs[name])
+                    else:
+                        raise ValueError(f"Argument '{name}' must be provided")
+        return func(*args, **new_kwargs)
 
-            cache_key = frozenset(updated_params.items())
-            if cache_key in cache_storage:
-                return cache_storage[cache_key]
+    return wrapper
 
-            result = target_function(**updated_params)
-            cache_storage[cache_key] = result
 
-            if max_cache_size > 0 and len(cache_storage) > max_cache_size:
-                cache_storage.popitem(last=False)
+def get_hash(arg: Any) -> str:
+    """Return hash value of arg."""
+    json_str = json.dumps(arg, sort_keys=True, ensure_ascii=False).encode("utf8")
+    return hashlib.sha256(json_str).hexdigest()
 
+
+def cache_results(cache_size: int = 0):
+    """Decorator for caching function results.
+    Keep finite number of last input arguments and corresponding results.
+
+    Parameters
+    ----------
+    cache_size : int
+        Number of last results to keep.
+
+    Returns
+    -------
+    Function
+    """
+
+    def decorator(func: Callable):
+        cache: OrderedDict[str, str] = OrderedDict()
+
+        @wraps(func)
+        def caching(*args, **kwargs):
+            key = get_hash(args), get_hash(kwargs)
+            if key in cache:
+                cache.move_to_end(key)
+                return cache[key]
+
+            result = func(*args, **kwargs)
+            if cache_size > 0:
+                if len(cache) >= cache_size:
+                    oldest_key = next(iter(cache))
+                    del cache[oldest_key]
+                cache[key] = result
             return result
 
-        return inner_wrapper
+        return caching
 
     return decorator

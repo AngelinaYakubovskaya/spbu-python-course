@@ -1,72 +1,75 @@
 import pytest
-from project.curry_uncurry import explicit_curry, explicit_uncurry
-
-# Tests for explicit_curry
-@pytest.mark.parametrize(
-    "args, expected",
-    [
-        ((1, 2, 3), "<1, 2, 3>"),
-        ((10, 20, 30), "<10, 20, 30>"),
-        ((5, 5, 5), "<5, 5, 5>"),
-    ],
-)
-def test_curry_explicit_valid_cases(args, expected):
-    curried_func = explicit_curry(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
-    assert curried_func(*args) == expected
+from project.curry_uncarry import curry_explicit, uncurry_explicit
 
 
-def test_curry_explicit_arity_zero():
-    curried_func = explicit_curry(lambda: "No args", 0)
-    assert curried_func() == "No args"
+def test_curry():
+    f = curry_explicit(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
+    assert f(1)(2)(3) == "<1, 2, 3>"
 
 
-def test_curry_explicit_arity_one():
-    curried_func = explicit_curry(lambda x: x * 2, 1)
-    assert curried_func(5) == 10
+def test_curry_zero_arity():
+    f = curry_explicit(lambda: 6, 0)
+    assert f() == 6
 
 
-@pytest.mark.parametrize("args", [(1, 2, 3), (1, 2, 3, 4)])
-def test_curry_explicit_too_many_arguments(args):
-    curried_func = explicit_curry(lambda x, y: x + y, 2)
-    with pytest.raises(TypeError):
-        curried_func(*args)
-
-
-@pytest.mark.parametrize("arity", [-1, "a"])
-def test_curry_explicit_invalid_arity(arity):
+def test_curry_negative_arity():
     with pytest.raises(ValueError):
-        explicit_curry(lambda x: x, arity)
+        curry_explicit(lambda x: x, -1)
 
 
-def test_curry_explicit_function_with_arbitrary_args():
-    curried_func = explicit_curry(print, 2)
-    assert curried_func(1)(2) is None
+def test_curry_single_arity():
+    f = curry_explicit(lambda x: x, 1)
+    assert f(36) == 36
 
 
-# Tests for explicit_uncurry
-@pytest.mark.parametrize(
-    "args, expected",
-    [
-        ((1, 2, 3), "<1, 2, 3>"),
-        ((4, 5, 6), "<4, 5, 6>"),
-    ],
-)
-def test_uncurry_explicit_valid_cases(args, expected):
-    curried_func = explicit_curry(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
-    uncurried_func = explicit_uncurry(curried_func, 3)
-    assert uncurried_func(*args) == expected
+def test_curry_built_in():
+    f = curry_explicit(divmod, 2)
+    assert f(5)(3) == (1, 2)
 
 
-@pytest.mark.parametrize("args", [(1,), (1, 2, 3)])
-def test_uncurry_explicit_wrong_argument_count(args):
-    curried_func = explicit_curry(lambda x, y: x + y, 2)
-    uncurried_func = explicit_uncurry(curried_func, 2)
+def test_curry_built_in_with_arbitrary_arity():
+    f = curry_explicit(max, 3)
+    assert f(5)(2)(56) == 56
+
+    # number of arguments of f is frozen and can't exceed 3
     with pytest.raises(TypeError):
-        uncurried_func(*args)
+        f(1)(2)(3)(6)
 
 
-@pytest.mark.parametrize("arity", [-1, "a"])
-def test_uncurry_explicit_invalid_arity(arity):
-    curried_func = explicit_curry(lambda x: x, 1)
+def test_uncurry():
+    f = curry_explicit(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
+    g = uncurry_explicit(f, 3)
+    assert g(1, 2, 3) == "<1, 2, 3>"
+
+
+def test_uncurry_zero_arity():
+    f = curry_explicit(lambda: 6, 0)
+    g = uncurry_explicit(f, 0)
+    assert g() == 6
+
+
+def test_uncurry_negative_arity():
     with pytest.raises(ValueError):
-        explicit_uncurry(curried_func, arity)
+        uncurry_explicit(lambda x: x, -1)
+
+
+def test_uncurry_single_arity():
+    f = curry_explicit(lambda x: x, 1)
+    g = uncurry_explicit(f, 1)
+    assert g(36) == 36
+
+
+def test_uncurry_built_in():
+    f = curry_explicit(divmod, 2)
+    g = uncurry_explicit(f, 2)
+    assert g(5, 3) == (1, 2)
+
+
+def test_uncurry_built_in_with_arbitrary_arity():
+    f = curry_explicit(max, 3)
+    g = uncurry_explicit(f, 3)
+    assert g(4, 7, 9) == 9
+
+    # number of arguments of g is frozen and can't exceed 3
+    with pytest.raises(TypeError):
+        g(1, 2, 3, 9)

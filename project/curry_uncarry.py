@@ -1,83 +1,86 @@
-from typing import Callable, Any
+from functools import wraps
+from typing import Callable, Any, List
 
 
-def explicit_curry(
-    original_func: Callable[..., Any], expected_arity: int
-) -> Callable[..., Any]:
-    """
-    Curries a function to accept one argument at a time.
+def curry_explicit(func: Callable, arity: int):
+    """Decorator for currying given function.
+    Do not support keword arguments.
 
     Parameters
     ----------
-    original_func : Callable[..., Any]
-        The function to be curried.
-    expected_arity : int
-        The number of arguments the original function requires.
-
-    Returns
-    -------
-    Callable[..., Any]
-        A curried version of the original function.
+    func : Callable
+        Function that currying will be applied to.
+    arity : int
+        Number of parameters of given function.
 
     Raises
     ------
     ValueError
-        If expected_arity is not a non-negative integer.
+        If arity is negative.
     TypeError
-        If too many arguments are provided when calling the curried function.
-    """
-    if not isinstance(expected_arity, int) or expected_arity < 0:
-        raise ValueError("Expected arity must be a non-negative integer.")
-
-    def curried(*provided_args: Any) -> Any:
-        arg_count = len(provided_args)
-        if arg_count > expected_arity:
-            raise TypeError(
-                f"Too many arguments: expected at most {expected_arity}, got {arg_count}."
-            )
-
-        if arg_count == expected_arity:
-            return original_func(*provided_args)
-
-        return lambda *additional_args: curried(*(provided_args + additional_args))
-
-    return curried
-
-
-def explicit_uncurry(
-    curried_function: Callable[..., Any], expected_arity: int
-) -> Callable[..., Any]:
-    """
-    Converts a curried function so that it can accept all arguments at once.
-
-    Parameters
-    ----------
-    curried_function : Callable[..., Any]
-        The curried function to be uncurried.
-    expected_arity : int
-        The number of arguments the original function requires.
+        If function takes 0 arguments but argument was given.
 
     Returns
     -------
-    Callable[..., Any]
-        The uncurried version of the function.
+    Function"""
+    if arity < 0:
+        raise ValueError("Arity cannot be negative")
+
+    args: List[Any] = []
+
+    @wraps(func)
+    def curry_func(arg=None):
+        if arity == 0 and not (arg is None):
+            raise TypeError("Arity is 0 but argument was given")
+        if arity == 0:
+            return func()
+        if len(args) > arity:
+            raise TypeError("Inappropriate number of arguments")
+        args.append(arg)
+        if len(args) == arity:
+            return func(*args)
+        else:
+            return curry_func
+
+    return curry_func
+
+
+def uncurry_explicit(func: Callable, arity: int):
+    """Decorator for uncurrying given function.
+    Do not support keyword arguments.
+    Inverse to curry_explicit decorator.
+
+    Parameters
+    ----------
+    func : Callable
+        Curried function that uncurrying will be applied to.
+    arity : int
+        Number of parameters of given function.
 
     Raises
     ------
     ValueError
-        If expected_arity is not a non-negative integer.
+        If arity is negative.
     TypeError
-        If the number of arguments provided does not match the expected arity.
-    """
-    if not isinstance(expected_arity, int) or expected_arity < 0:
-        raise ValueError("Expected arity must be a non-negative integer.")
+        If number of given arguments isn't equal to arity.
 
-    def uncurried(*args: Any) -> Any:
-        if len(args) != expected_arity:
-            raise TypeError(
-                f"Expected exactly {expected_arity} arguments, but got {len(args)}."
-            )
+    Returns
+    -------
+    Function"""
+    if arity < 0:
+        raise ValueError("Arity cannot be negative")
 
-        return curried_function(*args)
+    @wraps(func)
+    def uncurry_func(*args):
+        if arity != len(args):
+            raise TypeError("Inappropriate number of arguments")
 
-    return uncurried
+        if arity == 0:
+            return func()
+        uncurried = func
+        for arg in args:
+            uncurried = uncurried(arg)
+
+        return uncurried
+
+    return uncurry_func
