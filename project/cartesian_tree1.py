@@ -216,6 +216,20 @@ class CartesianTree(MutableMapping):
             yield node.key
             yield from self._reverse_inorder(node.left)
 
+    def _rotate_right(self, node):
+        """Perform a right rotation on the node and return the new root."""
+        new_root = node.left
+        node.left = new_root.right
+        new_root.right = node
+        return new_root
+
+    def _rotate_left(self, node):
+        """Perform a left rotation on the node and return the new root."""
+        new_root = node.right
+        node.right = new_root.left
+        new_root.left = node
+        return new_root
+
     def __len__(self):
         """Return the number of key-value pairs in the tree."""
         return self.size
