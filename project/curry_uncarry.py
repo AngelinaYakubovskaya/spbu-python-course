@@ -2,41 +2,48 @@ from functools import wraps
 from typing import Callable, Any, List
 
 
-def curry_explicit(func: Callable, arity: int):
-    """Decorator for currying given function.
-    Do not support keword arguments.
+def curry_explicit(func: Callable, arity: int) -> Callable:
+    """Decorator for transforming a given function into a curried version.
+
+    Currying is the process of breaking down a function that takes multiple
+    arguments into a series of functions that each take a single argument.
+
+    Note: This implementation does not support keyword arguments.
 
     Parameters
     ----------
     func : Callable
-        Function that currying will be applied to.
+        The function to be transformed into a curried form.
     arity : int
-        Number of parameters of given function.
+        The number of parameters that the original function accepts.
 
     Raises
     ------
     ValueError
-        If arity is negative.
+        If the specified arity is negative.
     TypeError
-        If function takes 0 arguments but argument was given.
+        If the original function takes zero arguments but an argument is provided.
 
     Returns
     -------
-    Function"""
+    Callable
+        A curried version of the input function.
+    """
     if arity < 0:
-        raise ValueError("Arity cannot be negative")
+        raise ValueError("Arity cannot be negative.")
 
     args: List[Any] = []
 
     @wraps(func)
     def curry_func(arg=None):
-        if arity == 0 and not (arg is None):
-            raise TypeError("Arity is 0 but argument was given")
+        if arity == 0 and arg is not None:
+            raise TypeError("Arity is 0 but an argument was given.")
         if arity == 0:
             return func()
         if len(args) > arity:
-            raise TypeError("Inappropriate number of arguments")
-        args.append(arg)
+            raise TypeError("Inappropriate number of arguments.")
+        if arg is not None:
+            args.append(arg)
         if len(args) == arity:
             return func(*args)
         else:
@@ -45,35 +52,40 @@ def curry_explicit(func: Callable, arity: int):
     return curry_func
 
 
-def uncurry_explicit(func: Callable, arity: int):
-    """Decorator for uncurrying given function.
-    Do not support keyword arguments.
-    Inverse to curry_explicit decorator.
+def uncurry_explicit(func: Callable, arity: int) -> Callable:
+    """Decorator for transforming a curried function back to its uncurried form.
+
+    This is the inverse of the `curry_explicit` decorator, allowing the
+    original function to accept multiple arguments again.
+
+    Note: This implementation does not support keyword arguments.
 
     Parameters
     ----------
     func : Callable
-        Curried function that uncurrying will be applied to.
+        The curried function to be transformed back to its uncurried form.
     arity : int
-        Number of parameters of given function.
+        The number of parameters that the original function accepts.
 
     Raises
     ------
     ValueError
-        If arity is negative.
+        If the specified arity is negative.
     TypeError
-        If number of given arguments isn't equal to arity.
+        If the number of provided arguments does not match the expected arity.
 
     Returns
     -------
-    Function"""
+    Callable
+        The uncurried version of the input function.
+    """
     if arity < 0:
-        raise ValueError("Arity cannot be negative")
+        raise ValueError("Arity cannot be negative.")
 
     @wraps(func)
     def uncurry_func(*args):
         if arity != len(args):
-            raise TypeError("Inappropriate number of arguments")
+            raise TypeError("Inappropriate number of arguments.")
 
         if arity == 0:
             return func()
