@@ -23,26 +23,25 @@ class CartesianTree(MutableMapping):
         self.size = 0
 
     def split(self, node, key):
-        """Split the tree rooted at node into two trees around key.
+        """Split the tree rooted at `node` into two trees around `key`.
 
         Args:
-        node (TreeNode): Root of the subtree to split.
-        key: The key used as a pivot for splitting.
+            node (TreeNode): Root of the subtree to split.
+            key: The key used as a pivot for splitting.
 
         Returns:
-        tuple: Two roots representing the left and right subtrees.
+            tuple: Two roots representing the left and right subtrees.
         """
-
-    if node is None:
-        return None, None
-    elif key > node.key:
-        # Split right subtree, attach result to right of current node
-        left, node.right = self.split(node.right, key)
-        return node, left
-    else:
-        # Split left subtree, attach result to left of current node
-        node.left, right = self.split(node.left, key)
-        return right, node
+        if node is None:
+            return None, None
+        elif key > node.key:
+            # Split right subtree, attach result to right of current node
+            left, node.right = self.split(node.right, key)
+            return node, left
+        else:
+            # Split left subtree, attach result to left of current node
+            node.left, right = self.split(node.left, key)
+            return right, node
 
     def merge(self, left, right):
         """Merge two trees `left` and `right` into a single tree.
@@ -141,9 +140,7 @@ class CartesianTree(MutableMapping):
         elif key > node.key:
             node.right = self._delete(node.right, key)
         else:
-            return self.merge(
-                node.left, node.right
-            )  # Merging left and right subtrees after deletion
+            return self.merge(node.left, node.right)
 
         return node
 
@@ -201,38 +198,6 @@ class CartesianTree(MutableMapping):
             yield node.key
             yield from self._inorder(node.right)
 
-    def __reversed__(self):
-        """Return an iterator for the keys in the tree in reverse sorted order."""
-        yield from self._reverse_inorder(self.root)
-
-    def _reverse_inorder(self, node):
-        """Perform a reverse in-order traversal of the tree.
-
-        Args:
-            node (TreeNode): The current node to traverse.
-
-        Yields:
-            The keys of the nodes in reverse sorted order.
-        """
-        if node is not None:
-            yield from self._reverse_inorder(node.right)
-            yield node.key
-            yield from self._reverse_inorder(node.left)
-
-    def _rotate_right(self, node):
-        """Perform a right rotation on the node and return the new root."""
-        new_root = node.left
-        node.left = new_root.right
-        new_root.right = node
-        return new_root
-
-    def _rotate_left(self, node):
-        """Perform a left rotation on the node and return the new root."""
-        new_root = node.right
-        node.right = new_root.left
-        new_root.left = node
-        return new_root
-
     def __len__(self):
         """Return the number of key-value pairs in the tree."""
         return self.size
@@ -251,3 +216,17 @@ class CartesianTree(MutableMapping):
             return True
         except KeyError:
             return False
+
+    def _rotate_right(self, node):
+        """Perform a right rotation on the node and return the new root."""
+        new_root = node.left
+        node.left = new_root.right
+        new_root.right = node
+        return new_root
+
+    def _rotate_left(self, node):
+        """Perform a left rotation on the node and return the new root."""
+        new_root = node.right
+        node.right = new_root.left
+        new_root.left = node
+        return new_root
