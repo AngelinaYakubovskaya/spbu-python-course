@@ -3,7 +3,7 @@ from project.bots.percentage_bot import PercentageBot
 from project.bots.passive_aggressive_bot import PassiveAggressiveBot
 from project.game import Game
 from project.croupier import Croupier
-from project.bots.bet import BetType
+from project.bots.bet import BetType, Bet, Color
 
 
 def test_game_initialization():
