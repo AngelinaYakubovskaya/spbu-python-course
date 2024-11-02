@@ -1,6 +1,6 @@
 import pytest
 import random
-from decorate import smart_args, Isolated, Evaluated
+from project.decorate import smart_args, Isolated, Evaluated
 
 
 @smart_args
