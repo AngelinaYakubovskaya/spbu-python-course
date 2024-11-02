@@ -1,60 +1,43 @@
 import random
+from enum import Enum
+
+
+class Color(Enum):
+    RED = "red"
+    BLACK = "black"
+    GREEN = "green"  # Для нуля на рулетке
 
 
 class Croupier:
     """
-    Handles the outcome generation and bet evaluation in the roulette game.
-
-    Methods:
-        spin_wheel(): Generates a random outcome for a roulette spin.
-        check_bet(bet, result): Checks if a player's bet matches the spin result.
-        payout_ratio(bet): Returns the payout ratio based on the bet type.
+    Represents the croupier in the roulette game.
     """
 
-    def spin_wheel(self):
-        """
-        Spins the roulette wheel and returns the outcome.
+    def __init__(self):
+        self.last_result = None
 
+    def spin_roulette(self):
+        """
+        Simulates spinning the roulette and returns the result.
         Returns:
-            dict: A dictionary with the generated number (0-36) and color ("red" or "black").
+            dict: The result containing 'number' and 'color'.
         """
-        number = random.randint(0, 36)
-        color = "red" if number % 2 == 0 else "black"
-        return {"number": number, "color": color}
+        number = random.randint(0, 36)  # 0 to 36 for a standard roulette
+        color = self.determine_color(number)
+        self.last_result = {"number": number, "color": color}
+        return self.last_result
 
-    def check_bet(self, bet, result):
+    def determine_color(self, number: int) -> Color:
         """
-        Checks if a bet matches the spin result.
-
+        Determines the color based on the number.
         Args:
-            bet (dict): The player's bet with 'type', 'value', and 'amount'.
-            result (dict): The spin result with 'number' and 'color'.
-
+            number (int): The number on the roulette.
         Returns:
-            bool: True if the bet wins, False otherwise.
+            Color: The color of the number.
         """
-        if bet["type"] == "number" and bet["value"] == result["number"]:
-            return True
-        elif bet["type"] == "color" and bet["value"] == result["color"]:
-            return True
-        elif bet["type"] == "range":
-            return bet["value"][0] <= result["number"] <= bet["value"][1]
-        return False
-
-    def payout_ratio(self, bet):
-        """
-        Determines the payout ratio for a winning bet.
-
-        Args:
-            bet (dict): The player's bet.
-
-        Returns:
-            int: The payout ratio for the bet type.
-        """
-        if bet["type"] == "number":
-            return 35
-        elif bet["type"] == "color":
-            return 2
-        elif bet["type"] == "range":
-            return 3
-        return 1
+        if number == 0:
+            return Color.GREEN
+        elif number % 2 == 0:
+            return Color.RED
+        else:
+            return Color.BLACK

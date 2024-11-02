@@ -7,9 +7,9 @@ from project.game import Game
 def run_example_game():
     """Run an example game of roulette and display the state in each round."""
     # Create players (bots)
-    bot1 = MartingaleBot("Martingale Bot")
-    bot2 = PercentageBot("Percentage Bot")
-    bot3 = PassiveAggressiveBot("Passive-Aggressive Bot")
+    bot1 = MartingaleBot("Martingale Bot", 100)
+    bot2 = PercentageBot("Percentage Bot", 100)
+    bot3 = PassiveAggressiveBot("Passive-Aggressive Bot", 100)
 
     # Initialize the game with the players
     game = Game(players=[bot1, bot2, bot3], max_steps=10)
@@ -17,11 +17,6 @@ def run_example_game():
     # Run the game
     print("Starting the Roulette Game!\n")
     game.run_game()
-
-    # Display the final balances of players
-    print("\nGame Over!")
-    for player in game.players:
-        print(f"{player.name} has a balance of {player.balance}")
 
 
 if __name__ == "__main__":
