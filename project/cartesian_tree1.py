@@ -33,22 +33,14 @@ class CartesianTree(MutableMapping):
             tuple: Two roots representing the left and right subtrees.
         """
         if node is None:
-            return None, None  # If the current node is None, return two None
+            return None, None
 
         if key < node.key:
-            # Split the left subtree
             left, node.left = self.split(node.left, key)
-            return (
-                left,
-                node,
-            )  # The left part goes to the left and the current node goes to the right
+            return left, node
         else:
-            # Split the right subtree
             node.right, right = self.split(node.right, key)
-            return (
-                node,
-                right,
-            )  # The current node goes to the left and the right part goes to the right
+            return node, right
 
     def merge(self, left, right):
         """Merge two trees left and right into a single tree.
@@ -256,3 +248,18 @@ class CartesianTree(MutableMapping):
             return True
         except KeyError:
             return False
+
+
+# Example usage and testing of the Cartesian Tree
+if __name__ == "__main__":
+    tree = CartesianTree()
+    tree[5] = "five"
+    tree[3] = "three"
+    tree[8] = "eight"
+
+    # Split the tree
+    left, right = tree.split(tree.root, 5)
+
+    # Check the left and right subtrees
+    print("Left subtree keys (should be < 5):", list(tree._inorder(left)))
+    print("Right subtree keys (should be >= 5):", list(tree._inorder(right)))
