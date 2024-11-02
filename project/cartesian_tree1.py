@@ -27,7 +27,7 @@ class CartesianTree(MutableMapping):
         if node is None:
             return None, None
 
-        if key < node.key:
+        if key <= node.key:  # Изменено с < на <=
             left, node.left = self.split(node.left, key)
             return left, node
         else:
@@ -114,14 +114,14 @@ class CartesianTree(MutableMapping):
 
     def __iter__(self):
         """Return an iterator for the keys in the tree in sorted order."""
-        yield from self._inorder(self.root)
+        yield from self._inorder_keys(self.root)
 
-    def _inorder(self, node):
-        """Perform an in-order traversal of the tree."""
+    def _inorder_keys(self, node):
+        """Helper function for in-order traversal returning keys."""
         if node is not None:
-            yield from self._inorder(node.left)
-            yield node
-            yield from self._inorder(node.right)
+            yield from self._inorder_keys(node.left)
+            yield node.key  # Возврат только ключа
+            yield from self._inorder_keys(node.right)
 
     def __reversed__(self):
         """Return an iterator for the keys in the tree in reverse sorted order."""
