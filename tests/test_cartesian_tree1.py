@@ -1,5 +1,5 @@
 import pytest
-from cartesian_tree import CartesianTree, TreeNode
+from project.cartesian_tree1 import CartesianTree, TreeNode
 
 
 @pytest.fixture
