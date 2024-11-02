@@ -3,15 +3,18 @@ from abc import ABC, abstractmethod
 
 class BasePlayer(ABC):
     """
-    Abstract base class for a player in the game.
+    Abstract base class for a player in the roulette game.
+
     Attributes:
         name (str): The name of the player.
-        balance (int): The current balance of the player.
+        balance (int): The player's current balance.
+        last_bet (dict): Stores the last bet made by the player.
     """
 
     def __init__(self, name: str, balance: int):
         """
-        Initializes a BasePlayer with a name and starting balance.
+        Initializes a player with a name and balance.
+
         Args:
             name (str): The name of the player.
             balance (int): The initial balance of the player.
@@ -23,15 +26,27 @@ class BasePlayer(ABC):
     @abstractmethod
     def make_bet(self):
         """
-        Abstract method for making a bet.
-        Must be implemented by subclasses.
+        Abstract method to be implemented by subclasses, specifying the player's betting strategy.
+
+        Returns:
+            dict: The bet with 'type', 'value', and 'amount'.
         """
         pass
 
-    def update_balance(self, amount: int):
+    def update_balance(self, amount):
         """
-        Updates the balance of the player.
+        Updates the player's balance.
+
         Args:
-            amount (int): The amount to adjust the balance by (can be positive or negative).
+            amount (int): The amount to add or subtract from the balance.
         """
         self.balance += amount
+
+    def get_balance(self):
+        """
+        Returns the current balance of the player.
+
+        Returns:
+            int: The player's balance.
+        """
+        return self.balance
