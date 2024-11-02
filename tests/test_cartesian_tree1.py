@@ -1,103 +1,120 @@
 import pytest
-from project.cartesian_tree1 import CartesianTree
+from cartesian_tree import CartesianTree, TreeNode
 
 
 @pytest.fixture
 def tree():
-    """Fixture to create a Cartesian tree for testing."""
+    """Fixture to provide a new CartesianTree for each test."""
     return CartesianTree()
 
 
-def test_insert_and_get(tree):
-    """Test inserting and retrieving values from the tree."""
+def test_insert(tree):
+    """Test inserting elements into the tree."""
     tree[5] = "five"
     tree[3] = "three"
     tree[8] = "eight"
+    assert tree[5] == "five"
+    assert tree[3] == "three"
+    assert tree[8] == "eight"
+    assert len(tree) == 3
 
-    assert tree.root.key == 5  # Корень должен быть 5
-    assert tree.root.left.key == 3  # Левый дочерний узел должен быть 3
-    assert tree.root.right.key == 8  # Правый дочерний узел должен быть 8
+
+def test_update_existing_key(tree):
+    """Test updating the value of an existing key in the tree."""
+    tree[5] = "five"
+    tree[5] = "FIVE"
+    assert tree[5] == "FIVE"
+    assert len(tree) == 1
 
 
 def test_delete(tree):
-    """Test deleting keys from the tree."""
+    """Test deleting elements from the tree."""
     tree[5] = "five"
     tree[3] = "three"
     tree[8] = "eight"
-
-    tree.delete(3)  # Удаляем ключ 3
-    assert 3 not in tree  # Проверяем, что ключ 3 больше не существует
-    # Проверяем, что левый узел не равен None
-    assert tree.root.left is not None
-    assert tree.root.left.key == 5  # Убедитесь, что левый узел корня все еще существует
+    del tree[5]
+    assert len(tree) == 2
+    with pytest.raises(KeyError):
+        _ = tree[5]
 
 
 def test_split(tree):
-    """Test splitting the tree into two subtrees."""
+    """Test the split method to split the tree into two subtrees."""
     tree[5] = "five"
     tree[3] = "three"
     tree[8] = "eight"
-
     left, right = tree.split(tree.root, 5)
-
-    # Проверяем, что ключи в левом поддереве меньше 5
-    left_keys = list(tree.inorder_traversal(left)) if left else []
-    right_keys = list(tree.inorder_traversal(right)) if right else []
-
-    assert all(
-        node < 5 for node in left_keys
-    )  # Все ключи в левом поддереве должны быть меньше 5
-    assert all(
-        node >= 5 for node in right_keys
-    )  # Все ключи в правом поддереве должны быть больше или равны 5
+    assert all(node.key < 5 for node in inorder_traversal(left))
+    assert all(node.key >= 5 for node in inorder_traversal(right))
 
 
-def test_inorder_iteration(tree):
-    """Test in-order iteration over the tree."""
-    tree[3] = "three"
-    tree[1] = "one"
-    tree[4] = "four"
-
-    keys = list(tree)
-    assert keys == [
-        1,
-        3,
-        4,
-    ]  # Ожидается, что при последовательном обходе будут получены отсортированные ключи
+def test_merge(tree):
+    """Test the merge method to combine two trees."""
+    left_tree = CartesianTree()
+    right_tree = CartesianTree()
+    left_tree[2] = "two"
+    left_tree[1] = "one"
+    right_tree[5] = "five"
+    right_tree[8] = "eight"
+    merged_root = tree.merge(left_tree.root, right_tree.root)
+    assert inorder_keys(merged_root) == [1, 2, 5, 8]
 
 
-def test_reverse_inorder_iteration(tree):
-    """Test reverse in-order iteration over the tree."""
-    tree[5] = "five"
-    tree[3] = "three"
-    tree[7] = "seven"
-
-    keys = list(tree.reverse_inorder())  # Используем метод для обратного обхода
-    assert keys == [7, 5, 3]  # Проверка обратного обхода
-
-
-def test_contains(tree):
-    """Test checking key containment."""
+def test_in_operator(tree):
+    """Test the `in` operator for key presence."""
     tree[5] = "five"
     assert 5 in tree
     assert 3 not in tree
 
 
-def test_length(tree):
-    """Test length of the tree."""
+def test_len(tree):
+    """Test that the length of the tree reflects the number of elements."""
     assert len(tree) == 0
-    tree[5] = "five"
-    tree[3] = "three"
+    tree[1] = "one"
+    assert len(tree) == 1
+    tree[2] = "two"
     assert len(tree) == 2
+    del tree[2]
+    assert len(tree) == 1
 
 
-def test_update_value(tree):
-    """Test updating an existing value in the tree."""
-    tree[5] = "five"
-    tree[5] = "updated five"  # Обновляем значение
+def test_empty_tree_behavior(tree):
+    """Test behavior of the tree when it is empty."""
+    assert len(tree) == 0
+    with pytest.raises(KeyError):
+        _ = tree[1]  # Should raise KeyError for nonexistent key
 
-    assert tree.root.key == 5
+
+def test_inorder_iteration(tree):
+    """Test in-order iteration over keys."""
+    tree[3] = "three"
+    tree[1] = "one"
+    tree[4] = "four"
+    tree[2] = "two"
+    assert list(tree) == [1, 2, 3, 4]
 
 
+def test_reverse_iteration(tree):
+    """Test reverse in-order iteration over keys."""
+    tree[3] = "three"
+    tree[1] = "one"
+    tree[4] = "four"
+    tree[2] = "two"
+    assert list(reversed(tree)) == [4, 3, 2, 1]
+
+
+def inorder_traversal(node):
+    """Helper function to get in-order traversal of tree."""
+    if node is None:
+        return []
+    return inorder_traversal(node.left) + [node] + inorder_traversal(node.right)
+
+
+def inorder_keys(node):
+    """Helper function to get sorted keys of a tree's nodes."""
+    return [n.key for n in inorder_traversal(node)]
+
+
+# Run tests
 if __name__ == "__main__":
     pytest.main()
