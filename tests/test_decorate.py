@@ -18,7 +18,7 @@ def check_isolation(*, d=Isolated()):
     Returns:
         dict: The modified dictionary with 'a' set to 0.
     """
-    # Create a deep copy of d to avoid modifying the original dictionary
+    # Создание глубокой копии d для предотвращения изменения оригинального словаря
     d_copy = copy.deepcopy(d)
     d_copy["a"] = 0
     return d_copy

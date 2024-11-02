@@ -1,4 +1,4 @@
-import copy
+import copy  # Убедитесь, что импорт сделан
 import inspect
 import random
 
