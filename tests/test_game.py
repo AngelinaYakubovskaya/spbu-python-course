@@ -36,7 +36,13 @@ def test_game_state_changes():
 def test_croupier_payout():
     """Проверьте, правильно ли Croupier рассчитывает коэффициенты выплат в зависимости от типа ставки."""
     croupier = Croupier()
+
+    # Создание ставок
+    bet_number = Bet(bet_type=BetType.NUMBER, value=7, amount=10)
+    bet_color = Bet(bet_type=BetType.COLOR, value=Color.RED, amount=10)
+    bet_range = Bet(bet_type=BetType.RANGE, value=(1, 18), amount=10)
+
     # Проверка выплат для разных типов ставок
-    assert croupier.payout_ratio(BetType.NUMBER) == 35
-    assert croupier.payout_ratio(BetType.COLOR) == 2
-    assert croupier.payout_ratio(BetType.RANGE) == 3
+    assert croupier.payout_ratio(bet_number) == 35
+    assert croupier.payout_ratio(bet_color) == 2
+    assert croupier.payout_ratio(bet_range) == 3

@@ -24,9 +24,9 @@ class Croupier:
             return bet.value[0] <= result["number"] <= bet.value[1]
         return False
 
-    def payout_ratio(self, bet: Bet):
+    def payout_ratio(self, bet: Bet) -> int:
         """
-        Determines the payout ratio for a winning bet.
+        Определяет коэффициент выплат по выигрышной ставке.
         """
         if bet.bet_type == BetType.NUMBER:
             return 35
@@ -34,4 +34,4 @@ class Croupier:
             return 2
         elif bet.bet_type == BetType.RANGE:
             return 3
-        return 1
+        return 0
