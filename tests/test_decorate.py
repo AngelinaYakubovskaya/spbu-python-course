@@ -18,8 +18,7 @@ def check_isolation(*, d=Isolated()):
     Returns:
         dict: The modified dictionary with 'a' set to 0.
     """
-    # Создание глубокой копии d для предотвращения изменения оригинального словаря
-    d_copy = copy.deepcopy(d)
+    d_copy = copy.deepcopy(d)  # Используем deepcopy для создания копии
     d_copy["a"] = 0
     return d_copy
 
@@ -50,13 +49,13 @@ def test_check_isolation():
     """Test for Isolated marker functionality to ensure deep-copying of mutable args."""
     original_dict = {"a": 10}
     result = check_isolation(d=original_dict)
-    assert result == {"a": 0}  # Проверяем, что 'a' установлено в 0 в копии
-    assert original_dict == {"a": 10}  # Оригинальный словарь не изменен
+    assert result == {"a": 0}  # Check that 'a' is set to 0 in the copy
+    assert original_dict == {"a": 10}  # Ensure the original dictionary is unchanged
 
 
 def test_check_evaluation():
     """Test for Evaluated marker functionality to ensure lazy evaluation."""
     result1 = check_evaluation()
     result2 = check_evaluation()
-    assert result1[0] == result2[0]  # `x` остается постоянным
-    assert result1[1] != result2[1]  # `y` изменяется между вызовами
+    assert result1[0] == result2[0]  # `x` remains constant
+    assert result1[1] != result2[1]  # `y` changes between calls

@@ -6,7 +6,7 @@ def curry_explicit(function, arity):
     if not isinstance(arity, int) or arity < 0:
         raise ValueError("Arity must be a non-negative integer")
 
-    # Для функции нулевой арности возвращаем её сразу
+    # For zero arity function, return it immediately
     if arity == 0:
         return function
 

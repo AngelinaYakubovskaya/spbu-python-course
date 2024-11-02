@@ -3,13 +3,13 @@ from project.curry_uncarry import curry_explicit, uncurry_explicit
 
 
 def test_zero_arity_function():
-    """Тестирование каррирования функции нулевой арности."""
+    """Test for currying a zero-arity function."""
     zero_arity_function = curry_explicit(lambda: "no args", 0)
     assert zero_arity_function() == "no args"
 
 
 def test_curry_and_uncurry():
-    """Тестирование каррирования и декаррирования функции с несколькими параметрами."""
+    """Test currying and uncurrying a function with multiple parameters."""
     f = lambda x, y, z: f"<{x},{y},{z}>"
     curried = curry_explicit(f, 3)
     uncurried = uncurry_explicit(curried, 3)
@@ -19,7 +19,7 @@ def test_curry_and_uncurry():
 
 
 def test_invalid_arity():
-    """Тестирование неправильной арности."""
+    """Test for invalid arity."""
     with pytest.raises(ValueError):
         curry_explicit(lambda x: x, -1)
     with pytest.raises(ValueError):
@@ -27,7 +27,7 @@ def test_invalid_arity():
 
 
 def test_too_many_arguments():
-    """Тестирование передачи слишком большого количества аргументов."""
+    """Test for too many arguments provided."""
     curried = curry_explicit(lambda x, y: x + y, 2)
     with pytest.raises(TypeError):
         curried(1)(2)(3)

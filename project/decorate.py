@@ -1,4 +1,4 @@
-import copy  # Убедитесь, что импорт сделан
+import copy
 import inspect
 import random
 
@@ -15,6 +15,7 @@ class Evaluated:
         self.func = func
 
     def evaluate(self):
+        """Evaluate the function and return its result."""
         return self.func()
 
 
@@ -37,15 +38,12 @@ def smart_args(func):
 
         # Iterate through bound arguments to apply Isolated and Evaluated logic
         for param_name, value in bound_args.arguments.items():
-            # Check if argument needs to be evaluated or isolated
-            if (
-                isinstance(sig.parameters[param_name].default, Evaluated)
-                and param_name not in kwargs
+            param = sig.parameters[param_name]
+            if isinstance(param.default, Evaluated) and param_name not in kwargs:
+                bound_args.arguments[param_name] = param.default.evaluate()
+            elif isinstance(param.default, Isolated) or (
+                value is None and param.default is None
             ):
-                bound_args.arguments[param_name] = sig.parameters[
-                    param_name
-                ].default.evaluate()
-            elif sig.parameters[param_name].default is None and value is None:
                 bound_args.arguments[param_name] = copy.deepcopy(value)
 
         return func(*bound_args.args, **bound_args.kwargs)
