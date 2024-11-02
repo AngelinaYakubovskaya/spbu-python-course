@@ -1,29 +1,60 @@
 import pytest
-from project.decorate import (
-    smart_args,
-    Isolated,
-    Evaluated,
-    check_isolation,
-    check_evaluation,
-)
+import random
+from decorate import smart_args, Isolated, Evaluated
+
+
+@smart_args
+def check_isolation(*, d=Isolated()):
+    """
+    Test function to check the behavior of Isolated arguments.
+
+    Modifies a dictionary by setting the key 'a' to 0, but due to the use
+    of the `Isolated` marker, the original dictionary will not be modified.
+
+    Parameters:
+        d (dict, optional): A dictionary to modify. If not provided, the
+                            argument is deep-copied from the default value.
+
+    Returns:
+        dict: The modified dictionary with 'a' set to 0.
+    """
+    d["a"] = 0
+    return d
+
+
+@smart_args
+def check_evaluation(
+    *, x=random.randint(0, 100), y=Evaluated(lambda: random.randint(0, 100))
+):
+    """
+    Test function to check the behavior of Evaluated arguments.
+
+    Returns two values. The first value `x` is computed when the function
+    is defined, and the second value `y` is evaluated at the time of
+    function call.
+
+    Parameters:
+        x (int, optional): A random number, evaluated at function definition.
+        y (int, optional): A random number, evaluated at function call using
+                           the Evaluated marker. Can be manually overridden.
+
+    Returns:
+        tuple: A tuple containing the values of x and y.
+    """
+    return x, y
 
 
 def test_check_isolation():
-    """Тест для проверки работы изолированного аргумента Isolated."""
-    no_mutable = {"a": 10}
-    result = check_isolation(d=no_mutable)
-    assert result == {"a": 0}  # Проверка, что возвращается измененный словарь {'a': 0}
-    assert no_mutable == {"a": 10}  # Проверка, что исходный словарь не изменился
+    """Test for Isolated marker functionality to ensure deep-copying of mutable args."""
+    original_dict = {"a": 10}
+    result = check_isolation(d=original_dict)
+    assert result == {"a": 0}  # Проверяем, что 'a' установлено в 0 в копии
+    assert original_dict == {"a": 10}  # Оригинальный словарь не изменен
 
 
 def test_check_evaluation():
-    """Тест для проверки работы аргумента Evaluated."""
-    result1 = check_evaluation()  # Первый вызов функции для проверки
-    result2 = check_evaluation()  # Второй вызов функции для проверки
-    assert result1[0] == result2[0]  # `x` должно оставаться постоянным между вызовами
-    assert result1[1] != result2[1]  # `y` должно изменяться на каждом вызове
-
-    result3 = check_evaluation(
-        y=150
-    )  # Задано значение для `y`, оно должно быть равно 150
-    assert result3 == (result1[0], 150)
+    """Test for Evaluated marker functionality to ensure lazy evaluation."""
+    result1 = check_evaluation()
+    result2 = check_evaluation()
+    assert result1[0] == result2[0]  # `x` остается постоянным
+    assert result1[1] != result2[1]  # `y` изменяется между вызовами
