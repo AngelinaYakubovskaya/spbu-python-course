@@ -1,5 +1,5 @@
-from bots.base_player import BasePlayer
-from croupier import Croupier
+from project.bots.base_player import BasePlayer
+from project.croupier import Croupier
 from typing import List
 
 

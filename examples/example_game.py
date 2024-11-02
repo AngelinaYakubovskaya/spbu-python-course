@@ -1,21 +1,28 @@
-from game import Game
-from bots.martingale_bot import MartingaleBot
-from bots.percentage_bot import PercentageBot
-from bots.passive_aggressive_bot import PassiveAggressiveBot
+from project.bots.martingale_bot import MartingaleBot
+from project.bots.percentage_bot import PercentageBot
+from project.bots.passive_aggressive_bot import PassiveAggressiveBot
+from project.game import Game
 
 
-def main():
-    # Create instances of bots
-    bot1 = MartingaleBot("MartingaleBot", 100)
-    bot2 = PercentageBot("PercentageBot", 200, 0.1)  # Bet 10% of balance
-    bot3 = PassiveAggressiveBot("PassiveAggressiveBot", 150)
+def run_example_game():
+    """Run an example game of roulette and display the state in each round."""
+    # Create players (bots)
+    bot1 = MartingaleBot("Martingale Bot")
+    bot2 = PercentageBot("Percentage Bot")
+    bot3 = PassiveAggressiveBot("Passive-Aggressive Bot")
 
-    # Create the game
-    game = Game(players=[bot1, bot2, bot3], max_steps=5)
+    # Initialize the game with the players
+    game = Game(players=[bot1, bot2, bot3], max_steps=10)
 
     # Run the game
+    print("Starting the Roulette Game!\n")
     game.run_game()
+
+    # Display the final balances of players
+    print("\nGame Over!")
+    for player in game.players:
+        print(f"{player.name} has a balance of {player.balance}")
 
 
 if __name__ == "__main__":
-    main()
+    run_example_game()
