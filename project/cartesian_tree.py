@@ -1,6 +1,6 @@
 import random
 from collections.abc import MutableMapping
-from typing import Optional, Tuple, Generator, Any, Union
+from typing import Optional, Tuple, Generator, Any
 
 
 class TreeNode:
@@ -75,7 +75,7 @@ class CartesianTree(MutableMapping):
         Returns:
             Tuple[Optional[TreeNode], Optional[TreeNode]]: Two subtrees, left with keys < key, right with keys >= key.
         """
-        if not node:
+        if node is None:
             return None, None
         if node.key < key:
             left, right = self.split(node.right, key)
@@ -125,12 +125,12 @@ class CartesianTree(MutableMapping):
         else:
             self.root = self._insert(self.root, key, value)
 
-    def _insert(self, node: TreeNode, key: Any, value: Any) -> TreeNode:
+    def _insert(self, node: Optional[TreeNode], key: Any, value: Any) -> TreeNode:
         """
         Insert a new key-value pair into the tree or update the existing key's value.
 
         Args:
-            node (TreeNode): The current node.
+            node (Optional[TreeNode]): The current node.
             key (Any): The key to insert or update.
             value (Any): The value to associate with the key.
 
@@ -143,11 +143,11 @@ class CartesianTree(MutableMapping):
 
         if key < node.key:
             node.left = self._insert(node.left, key, value)
-            if node.left.priority > node.priority:
+            if node.left and node.left.priority > node.priority:
                 node = self._rotate_right(node)
         elif key > node.key:
             node.right = self._insert(node.right, key, value)
-            if node.right.priority > node.priority:
+            if node.right and node.right.priority > node.priority:
                 node = self._rotate_left(node)
         else:
             node.value = value  # Update the value if the key already exists
@@ -170,12 +170,12 @@ class CartesianTree(MutableMapping):
         else:
             raise KeyError(f"Key {key} not found.")
 
-    def _delete(self, node: TreeNode, key: Any) -> Optional[TreeNode]:
+    def _delete(self, node: Optional[TreeNode], key: Any) -> Optional[TreeNode]:
         """
         Delete the node with the specified key from the tree.
 
         Args:
-            node (TreeNode): The current node.
+            node (Optional[TreeNode]): The current node.
             key (Any): The key to delete.
 
         Returns:
