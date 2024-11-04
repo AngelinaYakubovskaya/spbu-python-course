@@ -1,11 +1,22 @@
 import pytest
 from project.cartesian_tree import CartesianTree, TreeNode
+from io import StringIO
+import sys
 
 
 @pytest.fixture
 def tree():
     """Fixture to provide a new CartesianTree for each test."""
     return CartesianTree()
+
+
+@pytest.fixture
+def populated_tree(tree):
+    """Fixture to provide a CartesianTree pre-populated with certain elements."""
+    tree[5] = "five"
+    tree[3] = "three"
+    tree[8] = "eight"
+    return tree
 
 
 def test_insert(tree):
@@ -27,28 +38,22 @@ def test_update_existing_key(tree):
     assert len(tree) == 1
 
 
-def test_delete(tree):
+def test_delete(populated_tree):
     """Test deleting elements from the tree."""
-    tree[5] = "five"
-    tree[3] = "three"
-    tree[8] = "eight"
-    del tree[5]
-    assert len(tree) == 2
+    del populated_tree[5]
+    assert len(populated_tree) == 2
     with pytest.raises(KeyError):
-        _ = tree[5]
+        _ = populated_tree[5]
 
 
-def test_split(tree):
+def test_split(populated_tree):
     """Test the split method to split the tree into two subtrees."""
-    tree[5] = "five"
-    tree[3] = "three"
-    tree[8] = "eight"
-    left, right = tree.split(tree.root, 5)
+    left, right = populated_tree.split(populated_tree.root, 5)
     assert all(node.key < 5 for node in inorder_traversal(left))
     assert all(node.key >= 5 for node in inorder_traversal(right))
 
 
-def test_merge(tree):
+def test_merge():
     """Test the merge method to combine two trees."""
     left_tree = CartesianTree()
     right_tree = CartesianTree()
@@ -56,7 +61,7 @@ def test_merge(tree):
     left_tree[1] = "one"
     right_tree[5] = "five"
     right_tree[8] = "eight"
-    merged_root = tree.merge(left_tree.root, right_tree.root)
+    merged_root = CartesianTree().merge(left_tree.root, right_tree.root)
     assert inorder_keys(merged_root) == [1, 2, 5, 8]
 
 
@@ -85,22 +90,34 @@ def test_empty_tree_behavior(tree):
         _ = tree[1]  # Should raise KeyError for nonexistent key
 
 
-def test_inorder_iteration(tree):
+def test_inorder_iteration(populated_tree):
     """Test in-order iteration over keys."""
-    tree[3] = "three"
-    tree[1] = "one"
-    tree[4] = "four"
-    tree[2] = "two"
-    assert list(tree) == [1, 2, 3, 4]
+    assert list(populated_tree) == [3, 5, 8]
 
 
-def test_reverse_iteration(tree):
+def test_reverse_iteration(populated_tree):
     """Test reverse in-order iteration over keys."""
-    tree[3] = "three"
-    tree[1] = "one"
-    tree[4] = "four"
-    tree[2] = "two"
-    assert list(reversed(tree)) == [4, 3, 2, 1]
+    assert list(reversed(populated_tree)) == [8, 5, 3]
+
+
+def test_print_tree(populated_tree):
+    """Test the print_tree function output."""
+    expected_output = "Tree in sorted order:\nKey: 3, Value: three\nKey: 5, Value: five\nKey: 8, Value: eight\n"
+    captured_output = StringIO()
+    sys.stdout = captured_output
+    populated_tree.print_tree()
+    sys.stdout = sys.__stdout__
+    assert captured_output.getvalue() == expected_output
+
+
+def test_print_tree_reversed(populated_tree):
+    """Test the print_tree_reversed function output."""
+    expected_output = "Tree in reverse order:\nKey: 8, Value: eight\nKey: 5, Value: five\nKey: 3, Value: three\n"
+    captured_output = StringIO()
+    sys.stdout = captured_output
+    populated_tree.print_tree_reversed()
+    sys.stdout = sys.__stdout__
+    assert captured_output.getvalue() == expected_output
 
 
 def inorder_traversal(node):
