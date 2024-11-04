@@ -19,8 +19,8 @@ class TreeNode:
         self.priority: float = (
             random.random()
         )  # Random priority for maintaining heap property
-        self.left: Optional[TreeNode] = None
-        self.right: Optional[TreeNode] = None
+        self.left: Optional["TreeNode"] = None
+        self.right: Optional["TreeNode"] = None
 
 
 class CartesianTree(MutableMapping):
@@ -41,6 +41,7 @@ class CartesianTree(MutableMapping):
         Returns:
             TreeNode: The new root after rotation.
         """
+        assert node.left is not None, "Node must have a left child for rotation."
         new_root = node.left
         node.left = new_root.right
         new_root.right = node
@@ -56,6 +57,7 @@ class CartesianTree(MutableMapping):
         Returns:
             TreeNode: The new root after rotation.
         """
+        assert node.right is not None, "Node must have a right child for rotation."
         new_root = node.right
         node.right = new_root.left
         new_root.left = node
@@ -269,13 +271,13 @@ class CartesianTree(MutableMapping):
 
     def _reverse_inorder(self, node: Optional[TreeNode]) -> Generator[Any, None, None]:
         """
-        Perform reverse in-order traversal to retrieve keys in reverse sorted order.
+        Perform reverse in-order traversal to retrieve keys in descending order.
 
         Args:
             node (Optional[TreeNode]): The current node.
 
         Yields:
-            Any: The next key in reverse sorted order.
+            Any: The next key in descending order.
         """
         if node is not None:
             yield from self._reverse_inorder(node.right)
