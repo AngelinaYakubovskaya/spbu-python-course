@@ -102,4 +102,4 @@
 ## Контакты
 
 - Павел Алимов [@Krekep](https://github.com/Krekep)
-- Ссылка на JupyterNotebook (Якубовская) http://localhost:8888/notebooks/Untitled.ipynb
+- Ссылка на JupyterNotebook (Якубовская) [http://localhost:8888/notebooks/Untitled.ipynb](https://colab.research.google.com/drive/1i4U8AFSslfg8Wt0fTMAXIBYyxVEHBrwO?usp=sharing)
