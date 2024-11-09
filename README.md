@@ -102,5 +102,6 @@
 ## Контакты
 
 - Павел Алимов [@Krekep](https://github.com/Krekep)
-- Ссылка на JupyterNotebook (Якубовская): [JupyterNotebook](http://localhost:8888/notebooks/Jupyter.ipynb)
+- Ссылка на JupyterNotebook (Якубовская): [JupyterNotebook файл](http://localhost:8888/notebooks/Jupyter.ipynb)
+- Ссылка на JupyterNotebook (Якубовская): [JupyterNotebook Google Collab](https://colab.research.google.com/drive/1VJRa1S0MHWIteTb0hVmKdUW0-ZNchenZ#scrollTo=4fbac2e7-3d99-4e94-884e-eba75a2f778b)
 - Ссылка на Google Диск (Якубовская): [Google Диск](https://drive.google.com/drive/u/0/folders/1T20y9T364NNuMizRXhUZNX4C8kV5ahU2)
