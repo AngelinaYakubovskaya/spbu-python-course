@@ -102,3 +102,4 @@
 ## Контакты
 
 - Павел Алимов [@Krekep](https://github.com/Krekep)
+- Ссылка на Jupyter Notebook (Google Colab): [Задача 8](https://drive.google.com/file/d/12H5zATfjja_PlGdOeADvHTsM74DDPgwq/view?usp=sharing)
