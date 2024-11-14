@@ -97,4 +97,3 @@ def test_uncurry_built_in_with_arbitrary_arity():
     # Ensure that only exactly three arguments are accepted
     with pytest.raises(TypeError):
         g(1, 2, 3, 9)
-
