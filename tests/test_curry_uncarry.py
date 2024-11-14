@@ -31,14 +31,38 @@ def test_curry_built_in_with_arbitrary_arity():
     f = curry_explicit(max, 3)
     assert f(5)(2)(56) == 56
 
-    # number of arguments of f is frozen and can't exceed 3
+    # Check that the curried function doesn't allow more than one argument at each step
     with pytest.raises(TypeError):
-        f(1)(2)(3)(6)
+        f(1, 2)
+
+    f1 = f(1)
+    with pytest.raises(TypeError):
+        f1(2, 3)
+
+    f2 = f1(2)
+    with pytest.raises(TypeError):
+        f2(3, 4)
 
 
 def test_uncurry():
     f = curry_explicit(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
     g = uncurry_explicit(f, 3)
+    assert g(1, 2, 3) == "<1, 2, 3>"
+
+
+def test_uncurry_incorrect_argument_count():
+    f = curry_explicit(lambda x, y, z: f"<{x}, {y}, {z}>", 3)
+    g = uncurry_explicit(f, 3)
+
+    # Ensure too many arguments raise TypeError
+    with pytest.raises(TypeError):
+        g(1, 2, 3, 4)
+
+    # Ensure too few arguments raise TypeError
+    with pytest.raises(TypeError):
+        g(1, 2)
+
+    # Correct number of arguments should work
     assert g(1, 2, 3) == "<1, 2, 3>"
 
 
@@ -70,6 +94,7 @@ def test_uncurry_built_in_with_arbitrary_arity():
     g = uncurry_explicit(f, 3)
     assert g(4, 7, 9) == 9
 
-    # number of arguments of g is frozen and can't exceed 3
+    # Ensure that only exactly three arguments are accepted
     with pytest.raises(TypeError):
         g(1, 2, 3, 9)
+
