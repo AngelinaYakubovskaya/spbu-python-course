@@ -31,17 +31,26 @@ def test_curry_built_in_with_arbitrary_arity():
     f = curry_explicit(max, 3)
     assert f(5)(2)(56) == 56
 
-    # Check that the curried function doesn't allow more than one argument at each step
+    # Ensure curried function does not accept more than one argument at each stage
     with pytest.raises(TypeError):
-        f(1, 2)
+        f(
+            1, 2
+        )  # Attempt to call with multiple arguments in one step should raise TypeError
 
-    f1 = f(1)
+    f1 = f(1)  # Valid single argument step
     with pytest.raises(TypeError):
-        f1(2, 3)
+        f1(
+            2, 3
+        )  # Attempt to call with multiple arguments in one step should raise TypeError
 
-    f2 = f1(2)
+    f2 = f1(2)  # Another valid single argument step
+    assert f2(3) == max(1, 2, 3)  # Complete the call with final single argument
+
+    # Ensure it errors if we try to pass more arguments after fully curried
     with pytest.raises(TypeError):
-        f2(3, 4)
+        f2(3)(
+            4
+        )  # This call should raise TypeError as curried function should already be complete
 
 
 def test_uncurry():
