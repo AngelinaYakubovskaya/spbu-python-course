@@ -1,5 +1,5 @@
 import pytest
-from project.curry_uncarry import curry_explicit, uncurry_explicit
+from project.curry_uncurry import curry_explicit, uncurry_explicit
 
 
 def test_curry():
