@@ -1,0 +1,76 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+class BetType {
+    +COLOR: str
+    +NUMBER: str
+    +RANGE: str
+}
+
+class Color {
+    +RED: str
+    +BLACK: str
+}
+
+class Bet {
+    +bet_type: BetType
+    +value: any
+    +amount: int
+    +__init__(bet_type: BetType, value: any, amount: int)
+    +__repr__() -> str
+}
+
+class Croupier {
+    +spin_wheel() -> dict
+    +check_bet(bet: Bet, result: dict) -> bool
+    +payout_ratio(bet: Bet) -> int
+}
+
+abstract class BasePlayer {
+    +name: str
+    +balance: int
+    +last_bet: Optional[Bet]
+    +__init__(name: str, balance: int)
+    +make_bet() -> Bet
+    +update_balance(amount: int)
+    +get_balance() -> int
+}
+
+class MartingaleBot {
+    +base_bet: int
+    +current_bet: int
+    +__init__(name: str, balance: int)
+    +make_bet() -> Bet
+    +update_balance(amount: int)
+}
+
+class PercentageBot {
+    +make_bet() -> Bet
+}
+
+class PassiveAggressiveBot {
+    +make_bet() -> Bet
+}
+
+class Game {
+    +players: List[BasePlayer]
+    +croupier: Croupier
+    +max_steps: int
+    +current_step: int
+    -play_round()  ' Приватный метод
+    +__init__(players: List[BasePlayer], max_steps: int)
+    +run_game()
+    +get_game_state() -> dict
+}
+
+Game "1" --> "1" Croupier : manages >
+Game "1" --> "0..*" BasePlayer : players >
+Croupier --> "0..*" Bet : evaluates >
+Bet "1" --> "1" BetType : bet_type >
+Bet "1" --> "1" Color : value >
+
+BasePlayer <|-- "0..1" MartingaleBot
+BasePlayer <|-- "0..1" PercentageBot
+BasePlayer <|-- "0..1" PassiveAggressiveBot
+
+@enduml
