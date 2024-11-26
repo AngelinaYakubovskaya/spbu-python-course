@@ -102,4 +102,4 @@
 ## Контакты
 
 - Павел Алимов [@Krekep](https://github.com/Krekep)
-- Ссылка на Google Colab [Задание 9](https://colab.research.google.com/drive/1TLaL5tYu7wBb0Xfw-ulm3O9L58SbDWgV?usp=sharing)
+- Ссылка на Google Colab [Задание 10](https://colab.research.google.com/drive/1wTwosv1ePTx6LIJ_oBPYKJdnrxjDKRRs?usp=sharing)
